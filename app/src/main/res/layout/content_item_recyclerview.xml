@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/tvContent"
+        android:id="@+id/etContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -28,11 +28,12 @@
         tools:text="3일 미뤄둔 설거지하기" />
 
     <TextView
+        android:id="@+id/tvAlarmTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:textSize="12sp"
         app:layout_constraintStart_toEndOf="@id/cbCheck"
-        app:layout_constraintTop_toBottomOf="@id/tvContent"
+        app:layout_constraintTop_toBottomOf="@id/etContent"
         tools:text="오전 11:43" />
 </androidx.constraintlayout.widget.ConstraintLayout>
