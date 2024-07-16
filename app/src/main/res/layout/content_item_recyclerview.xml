@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="60dp">
+    android:layout_height="48dp">
 
     <CheckBox
         android:id="@+id/cbCheck"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginStart="28dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -19,14 +19,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="12dp"
-        android:hint="할 일을 적어주세요"
+        android:background="@null"
         android:fontFamily="@font/nsr"
+        android:hint="@string/hint"
         android:includeFontPadding="false"
+        android:inputType="text"
         android:textSize="20sp"
         app:layout_constraintStart_toEndOf="@id/cbCheck"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="3일 미뤄둔 설거지하기" />
+        app:layout_constraintTop_toTopOf="@id/cbCheck" />
 
     <TextView
         android:id="@+id/tvAlarmTime"
@@ -37,5 +37,6 @@
         android:textSize="12sp"
         app:layout_constraintStart_toEndOf="@id/cbCheck"
         app:layout_constraintTop_toBottomOf="@id/etContent"
-        tools:text="오전 11:43" />
+        tools:text="@string/to_do_time" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

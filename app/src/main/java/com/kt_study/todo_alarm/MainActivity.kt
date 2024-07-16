@@ -25,6 +25,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         categoryAdapter = CategoryAdapter(ArrayList())
         categoryAdapter.addData()
-        binding.rvTitle.adapter = categoryAdapter
+        categoryAdapter.addData()
+        categoryAdapter.addData()
+        categoryAdapter.addData()
+        binding.rvCategory.adapter = categoryAdapter
     }
 }

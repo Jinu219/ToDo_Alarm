@@ -28,6 +28,8 @@ class CategoryAdapter(private val categories: ArrayList<CategoryItem>) :
         holder.contentRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context)
         holder.contentRecyclerView.adapter = contentAdapter
         contentAdapter.addData()
+        contentAdapter.addData()
+        contentAdapter.addData()
     }
 
     fun addData() {
