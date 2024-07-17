@@ -1,17 +1,20 @@
 package com.kt_study.todo_alarm.categories
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleObserver
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.kt_study.todo_alarm.MainViewModel
 import com.kt_study.todo_alarm.categories.contents.ContentAdapter
-import com.kt_study.todo_alarm.databinding.CategoryItemRecyclerviewBinding
+import com.kt_study.todo_alarm.databinding.ItemCategoryBinding
 
-class CategoryAdapter(private val categories: ArrayList<CategoryItem>) :
+class CategoryAdapter(private val categories: MutableList<CategoryItem>, private val viewModel: MainViewModel) :
     RecyclerView.Adapter<CategoryViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
-        val binding = CategoryItemRecyclerviewBinding.inflate(
+        val binding = ItemCategoryBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
@@ -24,16 +27,22 @@ class CategoryAdapter(private val categories: ArrayList<CategoryItem>) :
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
         holder.bind(categories[position])
 
-        val contentAdapter = ContentAdapter(categories[position].contents)
+        var contentAdapter = ContentAdapter(categories[position].contents)
         holder.contentRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context)
         holder.contentRecyclerView.adapter = contentAdapter
-        contentAdapter.addData()
-        contentAdapter.addData()
-        contentAdapter.addData()
+
+        viewModel.contents.observe(this){
+            contentAdapter = ContentAdapter(it.toMutableList())
+            holder.binding.rvContent.adapter = contentAdapter
+        }
+
+        holder.binding.btnAddContent.setOnClickListener {
+            Log.d("Adapter","onClicked!")
+            viewModel.makeContent("","")
+        }
     }
 
-    fun addData() {
-        categories.add(CategoryItem())
-        notifyDataSetChanged()
+    fun getItem(position: Int): CategoryItem {
+        return categories[position]
     }
 }
