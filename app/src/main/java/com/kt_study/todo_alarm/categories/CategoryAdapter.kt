@@ -36,6 +36,7 @@ class CategoryAdapter(
         holder.binding.btnAddContent.setOnClickListener {
             Log.d("Adapter", "$position viewHolder Clicked!")
             makeContentItems(position)
+            notifyItemChanged(position)
         }
     }
 
