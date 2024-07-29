@@ -9,7 +9,5 @@ class CategoryViewHolder(val binding: ItemCategoryBinding) :
     RecyclerView.ViewHolder(binding.root) {
     val contentRecyclerView: RecyclerView = binding.rvContent
 
-    fun bind(data: CategoryItem) {
-
-    }
+    fun bind(data: CategoryItem) {}
 }
