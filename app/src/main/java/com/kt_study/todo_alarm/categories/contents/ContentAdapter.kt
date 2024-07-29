@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.kt_study.todo_alarm.AlarmFragment
 import com.kt_study.todo_alarm.databinding.ItemContentBinding
 
 class ContentAdapter(private val contents: MutableList<ContentItem>) :
@@ -21,6 +22,7 @@ class ContentAdapter(private val contents: MutableList<ContentItem>) :
     override fun getItemCount(): Int = contents.size
 
     override fun onBindViewHolder(holder: ContentViewHolder, position: Int) {
+
     }
 
 }
