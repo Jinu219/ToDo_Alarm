@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">ToDo_Alarm</string>
+    <string name="hint">할 일을 입력해주세요</string>
+    <string name="to_do_time">%s</string>
+    <string name="btn_plus">+</string>
 </resources>
