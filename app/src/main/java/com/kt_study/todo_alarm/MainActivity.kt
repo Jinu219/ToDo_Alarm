@@ -44,7 +44,6 @@ class MainActivity : AppCompatActivity() {
 
     fun initBtn() {
         binding.btnAddCategory.setOnClickListener {
-            AlarmFragment().show(supportFragmentManager, AlarmFragment().tag)
             viewModel.makeCategory("")
         }
     }
