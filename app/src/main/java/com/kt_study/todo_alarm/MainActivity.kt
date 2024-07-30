@@ -37,12 +37,16 @@ class MainActivity : AppCompatActivity() {
             binding.rvCategory.adapter = categoryAdapter
         }
 
+
+
     }
 
     fun initBtn() {
         binding.btnAddCategory.setOnClickListener {
+            AlarmFragment().show(supportFragmentManager, AlarmFragment().tag)
             viewModel.makeCategory("")
         }
+
 
     }
 
