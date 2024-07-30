@@ -9,7 +9,6 @@ import com.kt_study.todo_alarm.categories.contents.ContentAdapter
 import com.kt_study.todo_alarm.categories.contents.ContentItem
 
 class MainViewModel() : ViewModel() {
-    //이 리스트가 바뀌어야 observer가 작동함
     private val _categories = MutableLiveData<List<CategoryItem>>(/* value = */ listOf())
     val categories: LiveData<List<CategoryItem>> get() = _categories
     private var nowCategoryId = 0L
@@ -29,6 +28,5 @@ class MainViewModel() : ViewModel() {
         val category = _categories.value ?: listOf()
         val oldContents = category[position].contents
         category[position].contents.add(newContent)
-        Log.d("makeContent", "$position Category : ${category[position].contents}")
     }
 }

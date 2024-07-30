@@ -3,11 +3,10 @@ package com.kt_study.todo_alarm.categories
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleObserver
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.kt_study.todo_alarm.MainViewModel
 import com.kt_study.todo_alarm.categories.contents.ContentAdapter
+import com.kt_study.todo_alarm.categories.contents.ContentEventListener
 import com.kt_study.todo_alarm.databinding.ItemCategoryBinding
 
 class CategoryAdapter(
@@ -15,6 +14,7 @@ class CategoryAdapter(
     private val makeContentItems: (position: Int) -> Unit,
 ) :
     RecyclerView.Adapter<CategoryViewHolder>() {
+    private lateinit var contentClickListener: CategoryEventListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val binding = ItemCategoryBinding.inflate(
@@ -30,17 +30,23 @@ class CategoryAdapter(
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
         holder.bind(categories[position])
 
-        var contentAdapter = ContentAdapter(categories[position].contents)
+        val contentAdapter = ContentAdapter(categories[position].contents)
         holder.contentRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context)
         holder.contentRecyclerView.adapter = contentAdapter
+
+        contentAdapter.setOnAlarmClickListener(object : ContentEventListener {
+            override fun onAlarmBtnClick(contentPosition: Int) {
+                contentClickListener.onContentClick(holder.adapterPosition, contentPosition)
+            }
+        })
+
         holder.binding.btnAddContent.setOnClickListener {
-            Log.d("Adapter", "$position viewHolder Clicked!")
             makeContentItems(position)
             notifyItemChanged(position)
         }
     }
 
-    fun getItem(position: Int): CategoryItem {
-        return categories[position]
+    fun setContentClickListener(listener: CategoryEventListener) {
+        contentClickListener = listener
     }
 }

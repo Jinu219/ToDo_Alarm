@@ -6,6 +6,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.kt_study.todo_alarm.categories.CategoryAdapter
+import com.kt_study.todo_alarm.categories.CategoryEventListener
 import com.kt_study.todo_alarm.categories.CategoryViewHolder
 import com.kt_study.todo_alarm.categories.contents.ContentAdapter
 import com.kt_study.todo_alarm.databinding.ActivityMainBinding
@@ -14,10 +15,8 @@ import com.kt_study.todo_alarm.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var categoryAdapter: CategoryAdapter
-
     private val viewModel: MainViewModel by viewModels()
 
-    //val categories = arrayListOf(CategoryItem())
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -33,11 +32,13 @@ class MainActivity : AppCompatActivity() {
             categoryAdapter = CategoryAdapter(it.toMutableList()) { position ->
                 viewModel.makeContent(position, "", "")
             }
-            Log.d("makeContent", "init")
+            categoryAdapter.setContentClickListener(object : CategoryEventListener {
+                override fun onContentClick(parentPosition: Int, childPosition: Int) {
+                    AlarmFragment().show(supportFragmentManager, AlarmFragment().tag)
+                }
+            })
             binding.rvCategory.adapter = categoryAdapter
         }
-
-
 
     }
 
@@ -46,8 +47,5 @@ class MainActivity : AppCompatActivity() {
             AlarmFragment().show(supportFragmentManager, AlarmFragment().tag)
             viewModel.makeCategory("")
         }
-
-
     }
-
 }
