@@ -5,7 +5,6 @@ import com.kt_study.todo_alarm.databinding.ItemContentBinding
 
 class ContentViewHolder(
     val binding: ItemContentBinding,
-    private val alarmClickListener: ContentEventListener
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind() {

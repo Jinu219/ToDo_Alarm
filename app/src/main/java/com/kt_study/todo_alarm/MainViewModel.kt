@@ -1,11 +1,9 @@
 package com.kt_study.todo_alarm
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.kt_study.todo_alarm.categories.CategoryItem
-import com.kt_study.todo_alarm.categories.contents.ContentAdapter
 import com.kt_study.todo_alarm.categories.contents.ContentItem
 
 class MainViewModel() : ViewModel() {
@@ -26,7 +24,6 @@ class MainViewModel() : ViewModel() {
         nowContentId++
         val newContent = ContentItem(id = nowContentId, text = text, time = time)
         val category = _categories.value ?: listOf()
-        val oldContents = category[position].contents
         category[position].contents.add(newContent)
     }
 }

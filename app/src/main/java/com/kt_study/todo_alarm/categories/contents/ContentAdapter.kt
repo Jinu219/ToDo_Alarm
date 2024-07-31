@@ -3,7 +3,6 @@ package com.kt_study.todo_alarm.categories.contents
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.kt_study.todo_alarm.AlarmFragment
 import com.kt_study.todo_alarm.databinding.ItemContentBinding
 
 class ContentAdapter(
@@ -18,7 +17,7 @@ class ContentAdapter(
             parent,
             false
         )
-        return ContentViewHolder(binding, alarmClickListener)
+        return ContentViewHolder(binding)
     }
 
     override fun getItemCount(): Int = contents.size
