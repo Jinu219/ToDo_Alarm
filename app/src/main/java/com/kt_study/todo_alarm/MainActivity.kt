@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.room.Room
 import com.kt_study.todo_alarm.categories.CategoryAdapter
 import com.kt_study.todo_alarm.categories.CategoryEventListener
 import com.kt_study.todo_alarm.databinding.ActivityMainBinding
@@ -12,7 +13,9 @@ import com.kt_study.todo_alarm.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var categoryAdapter: CategoryAdapter
-    private val viewModel: MainViewModel by viewModels()
+    private val viewModel: MainViewModel by viewModels {
+        MainViewModelFactory(application)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,10 +27,10 @@ class MainActivity : AppCompatActivity() {
         initBtn()
     }
 
-    fun initObserve() {
+    private fun initObserve() {
         viewModel.categories.observe(this) {
             categoryAdapter = CategoryAdapter(it.toMutableList()) { position ->
-                viewModel.makeContent(position, "", "")
+                viewModel.makeContent(position, "", 0,0)
             }
             categoryAdapter.setContentClickListener(object : CategoryEventListener {
                 override fun onContentClick(parentPosition: Int, childPosition: Int) {
@@ -39,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun initBtn() {
+    private fun initBtn() {
         binding.btnAddCategory.setOnClickListener {
             viewModel.makeCategory("")
         }

@@ -1,29 +1,66 @@
 package com.kt_study.todo_alarm
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.kt_study.todo_alarm.categories.CategoryItem
-import com.kt_study.todo_alarm.categories.contents.ContentItem
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.kt_study.todo_alarm.categories.Category
+import com.kt_study.todo_alarm.categories.contents.Content
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import androidx.lifecycle.Lifecycle as Lifecycle
 
-class MainViewModel() : ViewModel() {
-    private val _categories = MutableLiveData<List<CategoryItem>>(/* value = */ listOf())
-    val categories: LiveData<List<CategoryItem>> get() = _categories
+class MainViewModel(application: Application) : AndroidViewModel(application){
+    private val _categories = MutableLiveData<List<Category>>(/* value = */ listOf())
+    private val repository: ToDoListRepository = ToDoListRepository.getInstance(application)
+    private val getAllContent : LiveData<List<Content>>
+    private val getAllCategory : LiveData<List<Category>>
+    val categories: LiveData<List<Category>> get() = _categories
+
     private var nowCategoryId = 0L
     private var nowContentId = 0L
 
+    init{
+        val contentDao = ToDoListDatabase.getInstance(application).contentDao()
+        val categoryDao = ToDoListDatabase.getInstance(application).categoryDao()
+        repository = ToDoListRepository(contentDao, categoryDao)
+        getAllContent = repository.getAllContent
+        getAllCategory = repository.getAllCategory
+    }
+
+    fun addContent(content: Content){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.addContent(content)
+        }
+    }
+
+    fun addCategory(category: Category){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.addCategory(category)
+        }
+    }
     fun makeCategory(title: String) {
         nowCategoryId++
         val newCategory =
-            CategoryItem(id = nowCategoryId, title = title, contents = mutableListOf())
+            Category(id = nowCategoryId, title = title, contents = mutableListOf())
         val categories = categories.value ?: listOf()
         _categories.value = categories + newCategory
     }
 
-    fun makeContent(position: Int, text: String, time: String) {
+    fun makeContent(position: Int, text: String, hour: Int, min: Int) {
         nowContentId++
-        val newContent = ContentItem(id = nowContentId, text = text, time = time)
+        val newContent = Content(
+            id = nowContentId,
+            categoryId = position.toLong(),
+            toDo = text,
+            hour = hour,
+            min = min
+        )
         val category = _categories.value ?: listOf()
+
         category[position].contents.add(newContent)
     }
 }

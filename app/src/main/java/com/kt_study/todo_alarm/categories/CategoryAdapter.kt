@@ -9,7 +9,7 @@ import com.kt_study.todo_alarm.categories.contents.ContentEventListener
 import com.kt_study.todo_alarm.databinding.ItemCategoryBinding
 
 class CategoryAdapter(
-    private val categories: MutableList<CategoryItem>,
+    private val categories: MutableList<Category>,
     private val makeContentItems: (position: Int) -> Unit,
 ) :
     RecyclerView.Adapter<CategoryViewHolder>() {

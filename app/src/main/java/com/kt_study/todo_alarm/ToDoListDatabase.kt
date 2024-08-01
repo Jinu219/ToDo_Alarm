@@ -1,0 +1,35 @@
+package com.kt_study.todo_alarm
+
+import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import com.kt_study.todo_alarm.categories.Category
+import com.kt_study.todo_alarm.categories.CategoryDao
+import com.kt_study.todo_alarm.categories.contents.Content
+import com.kt_study.todo_alarm.categories.contents.ContentDao
+
+@Database(entities = [Content::class, Category::class], version = 1)
+
+abstract class ToDoListDatabase : RoomDatabase() {
+    abstract fun contentDao(): ContentDao
+    abstract fun categoryDao(): CategoryDao
+
+    companion object {
+        @Volatile
+        private var INSTANCE: ToDoListDatabase? = null
+
+        @Synchronized
+        fun getInstance(context: Context): ToDoListDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    ToDoListDatabase::class.java,
+                    "todolist.db"
+                ).build()
+                INSTANCE = instance
+                instance
+            }
+        }
+    }
+}

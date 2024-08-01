@@ -1,15 +1,20 @@
 package com.kt_study.todo_alarm.categories.contents
 
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
+import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.kt_study.todo_alarm.ToDoListDatabase
 import com.kt_study.todo_alarm.databinding.ItemContentBinding
 
 class ContentAdapter(
-    private val contents: MutableList<ContentItem>,
+    private val contents: MutableList<Content>,
 ) :
     RecyclerView.Adapter<ContentViewHolder>() {
     private lateinit var alarmClickListener: ContentEventListener
+    private lateinit var db: ToDoListDatabase
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
         val binding = ItemContentBinding.inflate(
@@ -26,6 +31,17 @@ class ContentAdapter(
         holder.binding.btnAlarm.setOnClickListener {
             alarmClickListener.onAlarmBtnClick(position)
         }
+        holder.binding.etContent.setOnFocusChangeListener(object : OnFocusChangeListener {
+            override fun onFocusChange(v: View, hasFocus: Boolean) {
+                if (!hasFocus) {
+                    Log.d("editText", "It Has Focus!")
+                    db.contentDao().insertContent(
+                        Content(toDo = holder.binding.etContent.text.toString())
+                    )
+                }
+
+            }
+        })
     }
 
     fun setOnAlarmClickListener(listener: ContentEventListener) {
