@@ -1,13 +1,9 @@
-package com.kt_study.todo_alarm
+package com.kt_study.todo_alarm.db
 
-import android.app.Application
 import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.room.Room
 import com.kt_study.todo_alarm.categories.Category
-import com.kt_study.todo_alarm.categories.CategoryDao
 import com.kt_study.todo_alarm.categories.contents.Content
-import com.kt_study.todo_alarm.categories.contents.ContentDao
 
 class ToDoListRepository(context: Context) {
     private val contentDao: ContentDao = ToDoListDatabase.getInstance(context).contentDao()
@@ -29,7 +25,7 @@ class ToDoListRepository(context: Context) {
         @Volatile
         private var INSTANCE: ToDoListRepository? = null
 
-        fun getInstance(context: Context): ToDoListRepository{
+        fun getInstance(context: Context): ToDoListRepository {
             return INSTANCE ?: synchronized(this){
                 val instance = ToDoListRepository(context)
                 INSTANCE = instance

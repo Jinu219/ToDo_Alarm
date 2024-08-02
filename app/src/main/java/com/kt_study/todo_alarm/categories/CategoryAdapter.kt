@@ -1,9 +1,14 @@
 package com.kt_study.todo_alarm.categories
 
+import android.icu.text.CaseMap.Title
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
+import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.kt_study.todo_alarm.categories.contents.Content
 import com.kt_study.todo_alarm.categories.contents.ContentAdapter
 import com.kt_study.todo_alarm.categories.contents.ContentEventListener
 import com.kt_study.todo_alarm.databinding.ItemCategoryBinding
@@ -13,7 +18,8 @@ class CategoryAdapter(
     private val makeContentItems: (position: Int) -> Unit,
 ) :
     RecyclerView.Adapter<CategoryViewHolder>() {
-    private lateinit var contentClickListener: CategoryEventListener
+    private lateinit var categoryEventListener: CategoryEventListener
+    private lateinit var categoryFocusListener: CategoryFocusListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val binding = ItemCategoryBinding.inflate(
@@ -35,7 +41,7 @@ class CategoryAdapter(
 
         contentAdapter.setOnAlarmClickListener(object : ContentEventListener {
             override fun onAlarmBtnClick(contentPosition: Int) {
-                contentClickListener.onContentClick(holder.adapterPosition, contentPosition)
+                categoryEventListener.onContentClick(holder.adapterPosition, contentPosition)
             }
         })
 
@@ -43,9 +49,22 @@ class CategoryAdapter(
             makeContentItems(position)
             notifyItemChanged(position)
         }
+
+        holder.binding.etCategory.setOnFocusChangeListener(object : OnFocusChangeListener {
+            override fun onFocusChange(v: View?, hasFocus: Boolean) {
+                if (!hasFocus) {
+                    Log.d("CategoryEditText", "It Has Focus!")
+                    categoryFocusListener.addCategoryEntity(Category(title = holder.binding.etCategory.text.toString()))
+                }
+            }
+        })
     }
 
-    fun setContentClickListener(listener: CategoryEventListener) {
-        contentClickListener = listener
+    fun setCategoryListener(listener: CategoryEventListener) {
+        categoryEventListener = listener
+    }
+
+    fun setFocusListener(listener: CategoryFocusListener) {
+        categoryFocusListener = listener
     }
 }

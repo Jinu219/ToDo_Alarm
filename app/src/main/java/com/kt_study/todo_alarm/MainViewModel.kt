@@ -4,17 +4,16 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kt_study.todo_alarm.categories.Category
+import com.kt_study.todo_alarm.db.ToDoListDatabase
+import com.kt_study.todo_alarm.db.ToDoListRepository
 import com.kt_study.todo_alarm.categories.contents.Content
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import androidx.lifecycle.Lifecycle as Lifecycle
 
 class MainViewModel(application: Application) : AndroidViewModel(application){
-    private val _categories = MutableLiveData<List<Category>>(/* value = */ listOf())
+    private val _categories = MutableLiveData<List<Category>>(listOf())
     private val repository: ToDoListRepository = ToDoListRepository.getInstance(application)
     private val getAllContent : LiveData<List<Content>>
     private val getAllCategory : LiveData<List<Category>>
@@ -24,13 +23,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application){
     private var nowContentId = 0L
 
     init{
-        val contentDao = ToDoListDatabase.getInstance(application).contentDao()
-        val categoryDao = ToDoListDatabase.getInstance(application).categoryDao()
-        repository = ToDoListRepository(contentDao, categoryDao)
         getAllContent = repository.getAllContent
         getAllCategory = repository.getAllCategory
     }
 
+    // DB
     fun addContent(content: Content){
         viewModelScope.launch(Dispatchers.IO) {
             repository.addContent(content)
@@ -42,6 +39,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application){
             repository.addCategory(category)
         }
     }
+
+
+
+    // Add
     fun makeCategory(title: String) {
         nowCategoryId++
         val newCategory =

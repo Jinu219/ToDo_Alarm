@@ -1,13 +1,11 @@
-package com.kt_study.todo_alarm
+package com.kt_study.todo_alarm.db
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.kt_study.todo_alarm.categories.Category
-import com.kt_study.todo_alarm.categories.CategoryDao
 import com.kt_study.todo_alarm.categories.contents.Content
-import com.kt_study.todo_alarm.categories.contents.ContentDao
 
 @Database(entities = [Content::class, Category::class], version = 1)
 

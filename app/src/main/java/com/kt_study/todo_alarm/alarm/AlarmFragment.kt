@@ -1,4 +1,4 @@
-package com.kt_study.todo_alarm
+package com.kt_study.todo_alarm.alarm
 
 import android.os.Bundle
 import android.view.LayoutInflater

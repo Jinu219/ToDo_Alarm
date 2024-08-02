@@ -4,9 +4,11 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.room.Room
+import com.kt_study.todo_alarm.alarm.AlarmFragment
+import com.kt_study.todo_alarm.categories.Category
 import com.kt_study.todo_alarm.categories.CategoryAdapter
 import com.kt_study.todo_alarm.categories.CategoryEventListener
+import com.kt_study.todo_alarm.categories.CategoryFocusListener
 import com.kt_study.todo_alarm.databinding.ActivityMainBinding
 
 
@@ -32,12 +34,19 @@ class MainActivity : AppCompatActivity() {
             categoryAdapter = CategoryAdapter(it.toMutableList()) { position ->
                 viewModel.makeContent(position, "", 0,0)
             }
-            categoryAdapter.setContentClickListener(object : CategoryEventListener {
+            categoryAdapter.setCategoryListener(object : CategoryEventListener {
                 override fun onContentClick(parentPosition: Int, childPosition: Int) {
                     AlarmFragment().show(supportFragmentManager, AlarmFragment().tag)
                 }
             })
+            categoryAdapter.setFocusListener(object : CategoryFocusListener{
+                override fun addCategoryEntity(category: Category) {
+                    viewModel.addCategory(category)
+                }
+            })
             binding.rvCategory.adapter = categoryAdapter
+
+
         }
 
     }

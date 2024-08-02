@@ -6,7 +6,7 @@ import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.kt_study.todo_alarm.ToDoListDatabase
+import com.kt_study.todo_alarm.db.ToDoListDatabase
 import com.kt_study.todo_alarm.databinding.ItemContentBinding
 
 class ContentAdapter(
@@ -39,7 +39,6 @@ class ContentAdapter(
                         Content(toDo = holder.binding.etContent.text.toString())
                     )
                 }
-
             }
         })
     }

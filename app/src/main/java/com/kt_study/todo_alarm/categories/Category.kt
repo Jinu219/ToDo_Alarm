@@ -9,6 +9,5 @@ data class Category(
     @PrimaryKey
     val id: Long = 0L,
     var title: String = "",
-    val todo: String ="",
     val contents: MutableList<Content> = mutableListOf(),
 )
