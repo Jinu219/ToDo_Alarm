@@ -1,6 +1,5 @@
 package com.kt_study.todo_alarm.db
 
-import CategoryEntity
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -22,3 +21,4 @@ interface CategoryDao {
     @Delete
     fun deleteCategory(categoryEntity: CategoryEntity)
 }
+
