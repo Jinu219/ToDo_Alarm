@@ -12,7 +12,9 @@ import com.kt_study.todo_alarm.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var categoryAdapter: CategoryAdapter
-    private val viewModel: MainViewModel by viewModels()
+    private val viewModel: MainViewModel by viewModels() {
+        MainViewModelFactory((application as ToDoApplication).repository)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

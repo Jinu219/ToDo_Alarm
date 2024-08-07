@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.roomwordsample"
+    namespace = "com.kt_study.todo_alarm"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.roomwordsample"
+        applicationId = "com.kt_study.todo_alarm"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
