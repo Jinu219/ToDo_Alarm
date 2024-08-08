@@ -41,13 +41,13 @@ class MainViewModel(
 
     // DB Update Value
     fun updateCategory(category: CategoryEntity) = viewModelScope.launch {
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             repository.updateCategory(category)
         }
     }
 
     fun updateContent(content: ContentEntity) = viewModelScope.launch {
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             repository.updateContent(content)
         }
     }

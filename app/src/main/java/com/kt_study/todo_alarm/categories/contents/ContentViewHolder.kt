@@ -7,6 +7,5 @@ class ContentViewHolder(
     val binding: ItemContentBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind() {
-    }
+    fun bind() {}
 }

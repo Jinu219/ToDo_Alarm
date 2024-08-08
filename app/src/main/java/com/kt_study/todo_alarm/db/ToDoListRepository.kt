@@ -29,13 +29,13 @@ class ToDoListRepository(
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun updateCategory(category: CategoryEntity){
+    suspend fun updateCategory(category: CategoryEntity) {
         categoryDao.updateCategory(category)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun updateContent(content: ContentEntity){
+    suspend fun updateContent(content: ContentEntity) {
         contentDao.updateContent(content)
     }
 }

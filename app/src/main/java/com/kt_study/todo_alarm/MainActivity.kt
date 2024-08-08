@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
                 }
             })
 
-            categoryAdapter.setFocusChangeListener(object : CategoryFocusChangeListener{
+            categoryAdapter.setFocusChangeListener(object : CategoryFocusChangeListener {
                 override fun onFocusOut(categoryEntity: CategoryEntity) {
                     viewModel.updateCategory(categoryEntity)
                 }

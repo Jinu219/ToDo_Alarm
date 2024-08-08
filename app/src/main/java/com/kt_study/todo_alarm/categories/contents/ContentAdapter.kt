@@ -3,9 +3,7 @@ package com.kt_study.todo_alarm.categories.contents
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.kt_study.todo_alarm.categories.CategoryFocusChangeListener
 import com.kt_study.todo_alarm.databinding.ItemContentBinding
-import com.kt_study.todo_alarm.db.CategoryEntity
 import com.kt_study.todo_alarm.db.ContentEntity
 
 class ContentAdapter(
@@ -47,6 +45,7 @@ class ContentAdapter(
     fun setFocusChangeListener(listener: ContentFocusChangeListener) {
         contentFocusChangeListener = listener
     }
+
     fun setOnAlarmClickListener(listener: ContentEventListener) {
         alarmClickListener = listener
     }

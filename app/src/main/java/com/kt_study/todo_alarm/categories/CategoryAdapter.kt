@@ -1,9 +1,6 @@
 package com.kt_study.todo_alarm.categories
 
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
-import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -48,11 +45,13 @@ class CategoryAdapter(
 
         contentAdapter.setFocusChangeListener(object : ContentFocusChangeListener {
             override fun onFocusOut(contentEntity: ContentEntity) {
-                categoryFocusChangeListener.onContentFocusOut(ContentEntity(
-                    id = contentEntity.id,
-                    categoryId = categories[holder.adapterPosition].id,
-                    toDo = contentEntity.toDo,
-                ))
+                categoryFocusChangeListener.onContentFocusOut(
+                    ContentEntity(
+                        id = contentEntity.id,
+                        categoryId = categories[holder.adapterPosition].id,
+                        toDo = contentEntity.toDo,
+                    )
+                )
             }
         })
 
