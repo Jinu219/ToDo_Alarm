@@ -33,13 +33,16 @@ class CategoryAdapter(
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
         holder.bind(categories[position])
 
-        val contentAdapter = ContentAdapter(categories[position].contents)
+        val contentAdapter = ContentAdapter(holder.itemView.context, categories[position].contents)
         holder.contentRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context)
         holder.contentRecyclerView.adapter = contentAdapter
 
         contentAdapter.setOnAlarmClickListener(object : ContentEventListener {
-            override fun onAlarmBtnClick(contentPosition: Int) {
-                contentClickListener.onContentClick(holder.adapterPosition, contentPosition)
+            override fun onAlarmBtnClick(
+                contentPosition: Int,
+                updateTimeCallBack: (hour: Int, min: Int) -> Unit
+            ) {
+                contentClickListener.onContentClick(holder.adapterPosition, contentPosition, updateTimeCallBack)
             }
         })
 

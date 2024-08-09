@@ -24,7 +24,6 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         initObserve()
         initBtn()
     }
@@ -32,23 +31,30 @@ class MainActivity : AppCompatActivity() {
     fun initObserve() {
         viewModel.categories.observe(this) {
             categoryAdapter = CategoryAdapter(it.toMutableList()) { position ->
-                viewModel.makeContent(position, "", "")
+                viewModel.makeContent(position, "", 0, 0)
             }
             categoryAdapter.setContentClickListener(object : CategoryEventListener {
-                override fun onContentClick(parentPosition: Int, childPosition: Int) {
-                    AlarmFragment().show(supportFragmentManager, AlarmFragment().tag)
+                override fun onContentClick(
+                    parentPosition: Int,
+                    childPosition: Int,
+                    updateTimeCallBack: (hour: Int, min: Int) -> Unit
+                ) {
+                    val alarmFragment = AlarmFragment { selectedHour, selectedMin ->
+                        updateTimeCallBack(selectedHour, selectedMin)
+                    }
+                    alarmFragment.show(supportFragmentManager, "alarmFragment")
                 }
             })
+            categoryAdapter.setFocusChangeListener(
+                object : CategoryFocusChangeListener {
+                    override fun onFocusOut(categoryEntity: CategoryEntity) {
+                        viewModel.updateCategory(categoryEntity)
+                    }
 
-            categoryAdapter.setFocusChangeListener(object : CategoryFocusChangeListener {
-                override fun onFocusOut(categoryEntity: CategoryEntity) {
-                    viewModel.updateCategory(categoryEntity)
-                }
-
-                override fun onContentFocusOut(contentEntity: ContentEntity) {
-                    viewModel.updateContent(contentEntity)
-                }
-            })
+                    override fun onContentFocusOut(contentEntity: ContentEntity) {
+                        viewModel.updateContent(contentEntity)
+                    }
+                })
 
             binding.rvCategory.adapter = categoryAdapter
         }
