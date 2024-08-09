@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.kt_study.todo_alarm.categories.contents.ContentAdapter
 import com.kt_study.todo_alarm.categories.contents.ContentEventListener
 import com.kt_study.todo_alarm.categories.contents.ContentFocusChangeListener
+import com.kt_study.todo_alarm.categories.contents.ContentItem
 import com.kt_study.todo_alarm.databinding.ItemCategoryBinding
 import com.kt_study.todo_alarm.db.CategoryEntity
 import com.kt_study.todo_alarm.db.ContentEntity
@@ -40,9 +41,17 @@ class CategoryAdapter(
         contentAdapter.setOnAlarmClickListener(object : ContentEventListener {
             override fun onAlarmBtnClick(
                 contentPosition: Int,
-                updateTimeCallBack: (hour: Int, min: Int) -> Unit
+                onTimeSet: (hour: Int, min: Int) -> Unit
             ) {
-                contentClickListener.onContentClick(holder.adapterPosition, contentPosition, updateTimeCallBack)
+                val currentContent = categories[position].contents[contentPosition]
+                contentClickListener.onContentClick(
+                    holder.adapterPosition,
+                    childPosition = contentPosition,
+                    currentHour = currentContent.hour,
+                    currentMin = currentContent.min
+                ) { selectedHour, selecteMin ->
+                    onTimeSet(selectedHour, selecteMin)
+                }
             }
         })
 
@@ -76,6 +85,10 @@ class CategoryAdapter(
                 )
             }
         }
+    }
+
+    fun getContentItem(parentPosition: Int, childPosition: Int): ContentItem {
+        return categories[parentPosition].contents[childPosition]
     }
 
 

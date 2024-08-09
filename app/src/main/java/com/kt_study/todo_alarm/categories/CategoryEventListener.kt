@@ -4,6 +4,8 @@ interface CategoryEventListener {
     fun onContentClick(
         parentPosition: Int,
         childPosition: Int,
+        currentHour:Int,
+        currentMin:Int,
         updateTimeCallBack: (hour: Int, min: Int) -> Unit
     )
 }

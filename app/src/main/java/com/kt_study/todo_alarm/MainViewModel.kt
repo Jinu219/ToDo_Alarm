@@ -20,8 +20,8 @@ class MainViewModel(
 
     private val _categories = MutableLiveData<List<CategoryItem>>(/* value = */ listOf())
     val categories: LiveData<List<CategoryItem>> get() = _categories
-    private var nowCategoryId = 160L
-    private var nowContentId = 200
+    private var nowCategoryId = 300
+    private var nowContentId = 300
 
     val getAllCategories: LiveData<List<CategoryEntity>> = repository.getAllCategory.asLiveData()
     val getAllContents: LiveData<List<ContentEntity>> = repository.getAllContent.asLiveData()
@@ -70,17 +70,20 @@ class MainViewModel(
 
     }
 
-    fun makeContent(position: Int, text: String, hour: Int, min: Int) {
+    fun makeContent(categoryPosition: Int, categoryId:Int, toDo: String, hour: Int, min: Int) {
         nowContentId++
-        val newContent = ContentItem(id = nowContentId, text = text, hour = hour, min = min)
+        val newContent = ContentItem(id = nowContentId, categoryId = categoryId, toDo = toDo, hour = hour, min = min)
         val category = _categories.value ?: listOf()
-        category[position].contents.add(newContent)
+        category[categoryPosition].contents.add(newContent)
 
         insertContent(
             ContentEntity(
                 id = newContent.id,
-                categoryId = category[position].id,
-                toDo = newContent.text
+                categoryId = category[categoryPosition].id,
+                toDo = newContent.toDo,
+                hour = newContent.hour,
+                min = newContent.min
+                
             )
         )
     }
