@@ -13,7 +13,7 @@ class ContentAdapter(
     private val contents: MutableList<ContentItem>,
 ) :
     RecyclerView.Adapter<ContentViewHolder>() {
-    private lateinit var alarmClickListener: ContentEventListener
+    private lateinit var alarmClickListener: ContentAlarmBtnClickListener
     private lateinit var contentFocusChangeListener: ContentFocusChangeListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
@@ -60,7 +60,7 @@ class ContentAdapter(
         contentFocusChangeListener = listener
     }
 
-    fun setOnAlarmClickListener(listener: ContentEventListener) {
+    fun setOnAlarmClickListener(listener: ContentAlarmBtnClickListener) {
         alarmClickListener = listener
     }
 }

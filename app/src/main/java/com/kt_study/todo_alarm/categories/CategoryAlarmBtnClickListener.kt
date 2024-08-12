@@ -1,6 +1,6 @@
 package com.kt_study.todo_alarm.categories
 
-interface CategoryEventListener {
+interface CategoryAlarmBtnClickListener {
     fun onContentClick(
         parentPosition: Int,
         childPosition: Int,

@@ -1,11 +1,12 @@
 package com.kt_study.todo_alarm.categories
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kt_study.todo_alarm.categories.contents.ContentAdapter
-import com.kt_study.todo_alarm.categories.contents.ContentEventListener
+import com.kt_study.todo_alarm.categories.contents.ContentAlarmBtnClickListener
 import com.kt_study.todo_alarm.categories.contents.ContentFocusChangeListener
 import com.kt_study.todo_alarm.categories.contents.ContentItem
 import com.kt_study.todo_alarm.databinding.ItemCategoryBinding
@@ -17,7 +18,7 @@ class CategoryAdapter(
     private val makeContentItems: (position: Int) -> Unit,
 ) :
     RecyclerView.Adapter<CategoryViewHolder>() {
-    private lateinit var contentClickListener: CategoryEventListener
+    private lateinit var contentClickListener: CategoryAlarmBtnClickListener
     private lateinit var categoryFocusChangeListener: CategoryFocusChangeListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
@@ -31,17 +32,17 @@ class CategoryAdapter(
 
     override fun getItemCount(): Int = categories.size
 
-    override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: CategoryViewHolder, @SuppressLint("RecyclerView") position: Int) {
         holder.bind(categories[position])
 
         val contentAdapter = ContentAdapter(holder.itemView.context, categories[position].contents)
         holder.contentRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context)
         holder.contentRecyclerView.adapter = contentAdapter
 
-        contentAdapter.setOnAlarmClickListener(object : ContentEventListener {
+        contentAdapter.setOnAlarmClickListener(object : ContentAlarmBtnClickListener {
             override fun onAlarmBtnClick(
                 contentPosition: Int,
-                onTimeSet: (hour: Int, min: Int) -> Unit
+                ontTimeSet: (hour: Int, min: Int) -> Unit
             ) {
                 val currentContent = categories[position].contents[contentPosition]
                 contentClickListener.onContentClick(
@@ -49,8 +50,8 @@ class CategoryAdapter(
                     childPosition = contentPosition,
                     currentHour = currentContent.hour,
                     currentMin = currentContent.min
-                ) { selectedHour, selecteMin ->
-                    onTimeSet(selectedHour, selecteMin)
+                ) { selectedHour, selectedMin ->
+                    ontTimeSet(selectedHour, selectedMin)
                 }
             }
         })
@@ -62,6 +63,8 @@ class CategoryAdapter(
                         id = contentEntity.id,
                         categoryId = categories[holder.adapterPosition].id,
                         toDo = contentEntity.toDo,
+                        hour = contentEntity.hour,
+                        min = contentEntity.min
                     )
                 )
             }
@@ -73,7 +76,7 @@ class CategoryAdapter(
         }
 
         // etCategory의 값이 엔터를 눌렀을떄에 DB로 값이 업데이트가 되게 구현
-        holder.binding.etCategory.setOnFocusChangeListener { v, hasFocus ->
+        holder.binding.etCategory.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
                 val newValue = holder.binding.etCategory.text.toString()
                 val categoryId = categories[position].id
@@ -96,7 +99,7 @@ class CategoryAdapter(
         categoryFocusChangeListener = listener
     }
 
-    fun setContentClickListener(listener: CategoryEventListener) {
+    fun setContentClickListener(listener: CategoryAlarmBtnClickListener) {
         contentClickListener = listener
     }
 }
