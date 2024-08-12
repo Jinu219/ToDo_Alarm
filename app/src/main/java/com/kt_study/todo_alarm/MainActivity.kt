@@ -4,14 +4,15 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.kt_study.todo_alarm.categories.CategoryAdapter
-import com.kt_study.todo_alarm.categories.CategoryEventListener
+import com.kt_study.todo_alarm.categories.CategoryAlarmBtnClickListener
 import com.kt_study.todo_alarm.categories.CategoryFocusChangeListener
-import com.kt_study.todo_alarm.categories.CategoryItem
 import com.kt_study.todo_alarm.categories.contents.ContentItem
 import com.kt_study.todo_alarm.databinding.ActivityMainBinding
 import com.kt_study.todo_alarm.db.CategoryEntity
 import com.kt_study.todo_alarm.db.ContentEntity
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -28,15 +29,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         initObserve()
         initBtn()
+
     }
 
-    fun initObserve() {
+
+    private fun initObserve() {
+        lifecycleScope.launch {
+            viewModel.clearDatabase()
+        }
         viewModel.categories.observe(this) { categories ->
             categoryAdapter = CategoryAdapter(categories.toMutableList()) { position ->
                 val categoryId = categories[position].id
                 viewModel.makeContent(position, categoryId, "", 0, 0)
             }
-            categoryAdapter.setContentClickListener(object : CategoryEventListener {
+            categoryAdapter.setContentClickListener(object : CategoryAlarmBtnClickListener {
                 override fun onContentClick(
                     parentPosition: Int,
                     childPosition: Int,
@@ -51,7 +57,7 @@ class MainActivity : AppCompatActivity() {
                         initialMin = contentItem.min
                     ) { selectedHour, selectedMin ->
                         val updatedContentEntity =
-                            contentEntity.copy(hour = selectedHour, min = selectedMin)
+                            contentEntity.copy(hour = selectedHour, min = selectedMin, toDo = contentEntity.toDo)
                         viewModel.updateContent(updatedContentEntity)
                         categoryAdapter.notifyItemChanged(parentPosition)
                         updateTimeCallBack(selectedHour, selectedMin)
@@ -75,7 +81,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun initBtn() {
+    private fun initBtn() {
         binding.btnAddCategory.setOnClickListener {
             viewModel.makeCategory("")
         }

@@ -12,6 +12,8 @@ interface CategoryDao {
     @Query("SELECT * FROM table_category")
     fun getAllCategories(): Flow<List<CategoryEntity>>
 
+    @Query("DELETE FROM table_category")
+    fun deleteAllCategories()
     @Insert
     fun insertCategory(categoryEntity: CategoryEntity)
 
@@ -20,5 +22,6 @@ interface CategoryDao {
 
     @Delete
     fun deleteCategory(categoryEntity: CategoryEntity)
+
 }
 

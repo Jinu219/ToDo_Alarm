@@ -20,5 +20,7 @@ interface ContentDao {
 
     @Delete
     fun deleteContent(contentEntity: ContentEntity)
+    @Query("DELETE FROM table_content")
+    fun deleteAllContents()
 
 }
