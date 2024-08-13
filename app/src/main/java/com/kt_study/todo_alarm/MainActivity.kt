@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
             viewModel.clearDatabase()
         }
         viewModel.categories.observe(this) { categories ->
-            categoryAdapter = CategoryAdapter(categories.toMutableList()) { position ->
+            categoryAdapter = CategoryAdapter(this, categories.toMutableList()) { position ->
                 val categoryId = categories[position].id
                 viewModel.makeContent(position, categoryId, "", 0, 0)
 

@@ -24,8 +24,8 @@ class MainViewModel(
     private var nowCategoryId = 1
     private var nowContentId = 1
 
-    val getAllCategories: LiveData<List<CategoryEntity>> = repository.getAllCategory.asLiveData()
-    val getAllContents: LiveData<List<ContentEntity>> = repository.getAllContent.asLiveData()
+    val getAllCategories: LiveData<List<CategoryEntity>> = repository.getAllCategories.asLiveData()
+    val getAllContents: LiveData<List<ContentEntity>> = repository.getAllContents.asLiveData()
 
     // DB Insert Value
     private fun insertCategory(category: CategoryEntity) = viewModelScope.launch {
@@ -57,19 +57,50 @@ class MainViewModel(
     // RecyclerView
     fun makeCategory(title: String) {
         nowCategoryId++
-        val newCategory =
-            CategoryItem(id = nowCategoryId, title = title, contents = mutableListOf())
-        val categories = categories.value ?: listOf()
-        _categories.value = categories + newCategory
+        val newCategoryId = nowCategoryId
 
-        insertCategory(
-            CategoryEntity(
-                id = newCategory.id,
-                title = newCategory.title
+        viewModelScope.launch {
+            // 기존 카테고리 및 콘텐츠를 가져옵니다.
+            val existingCategories = repository.getAllCategories.firstOrNull() ?: listOf()
+            val existingContents = repository.getAllContents.firstOrNull() ?: listOf()
+
+            // 새로운 카테고리를 생성합니다.
+            val newCategory = CategoryItem(id = newCategoryId, title = title, contents = mutableListOf())
+
+            // 기존 카테고리와 콘텐츠를 포함하여 업데이트된 카테고리 목록을 생성합니다.
+            val updatedCategories = existingCategories.map { categoryEntity ->
+                CategoryItem(
+                    id = categoryEntity.id,
+                    title = categoryEntity.title,
+                    contents = existingContents.filter { it.categoryId == categoryEntity.id }
+                        .map { contentEntity ->
+                            ContentItem(
+                                contentId = contentEntity.contentId,
+                                categoryId = contentEntity.categoryId,
+                                toDo = contentEntity.toDo,
+                                hour = contentEntity.hour,
+                                min = contentEntity.min
+                            )
+                        }.toMutableList()
+                )
+            }.toMutableList()
+
+            // 새로운 카테고리를 추가합니다.
+            updatedCategories.add(newCategory)
+
+            // LiveData를 업데이트하여 RecyclerView가 변경 사항을 반영하도록 합니다.
+            _categories.value = updatedCategories
+
+            // 새 카테고리를 데이터베이스에 삽입합니다.
+            insertCategory(
+                CategoryEntity(
+                    id = newCategoryId,
+                    title = title
+                )
             )
-        )
-
+        }
     }
+
 
     fun makeContent(categoryPosition: Int, categoryId: Int, toDo: String, hour: Int, min: Int) {
         nowContentId++

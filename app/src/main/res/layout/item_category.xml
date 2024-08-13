@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:background="@null"
         android:hint="@string/hint"
+        android:text="@string/alarm_title"
         android:paddingStart="20dp"
         android:inputType="text"
         android:paddingTop="15dp"

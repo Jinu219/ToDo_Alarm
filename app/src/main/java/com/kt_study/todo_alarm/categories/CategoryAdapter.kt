@@ -1,10 +1,14 @@
 package com.kt_study.todo_alarm.categories
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat.getString
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.kt_study.todo_alarm.R
 import com.kt_study.todo_alarm.categories.contents.ContentAdapter
 import com.kt_study.todo_alarm.categories.contents.ContentAlarmBtnClickListener
 import com.kt_study.todo_alarm.categories.contents.ContentFocusChangeListener
@@ -15,6 +19,7 @@ import com.kt_study.todo_alarm.db.CategoryEntity
 import com.kt_study.todo_alarm.db.ContentEntity
 
 class CategoryAdapter(
+    private val context: Context,
     private val categories: MutableList<CategoryItem>,
     private val makeContentItems: (position: Int) -> Unit,
 ) :
@@ -39,6 +44,8 @@ class CategoryAdapter(
         @SuppressLint("RecyclerView") position: Int
     ) {
         holder.bind(categories[position])
+        val item = categories[position]
+        holder.binding.etCategory.text = SpannableStringBuilder(context.getString(R.string.alarm_title, item.title))
 
         val contentAdapter = ContentAdapter(holder.itemView.context, categories[position].contents)
         holder.contentRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context)

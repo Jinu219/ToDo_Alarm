@@ -5,7 +5,7 @@
     <string name="to_do_time">%d:%d</string>
     <string name="btn_plus">+</string>
 
-    <string name="alarm_title">알람 시간</string>
+    <string name="alarm_title">%s</string>
     <string name="btn_cancel">취소</string>
     <string name="btn_confirm">확인</string>
 </resources>

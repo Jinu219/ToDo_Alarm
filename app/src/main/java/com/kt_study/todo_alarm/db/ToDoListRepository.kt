@@ -8,8 +8,8 @@ class ToDoListRepository(
     private val contentDao: ContentDao
 ) {
 
-    val getAllContent: Flow<List<ContentEntity>> = contentDao.getAllContents()
-    val getAllCategory: Flow<List<CategoryEntity>> = categoryDao.getAllCategories()
+    val getAllContents: Flow<List<ContentEntity>> = contentDao.getAllContents()
+    val getAllCategories: Flow<List<CategoryEntity>> = categoryDao.getAllCategories()
 
     // Insert
     @Suppress("RedundantSuspendModifier")
