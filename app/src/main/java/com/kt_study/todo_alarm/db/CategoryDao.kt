@@ -14,6 +14,7 @@ interface CategoryDao {
 
     @Query("DELETE FROM table_category")
     fun deleteAllCategories()
+
     @Insert
     fun insertCategory(categoryEntity: CategoryEntity)
 

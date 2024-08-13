@@ -7,7 +7,6 @@ import android.text.SpannableStringBuilder
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat.getString
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kt_study.todo_alarm.R
@@ -47,7 +46,8 @@ class CategoryAdapter(
     ) {
         holder.bind(categories[position])
         val item = categories[position]
-        holder.binding.etCategory.text = SpannableStringBuilder(context.getString(R.string.alarm_title, item.title))
+        holder.binding.etCategory.text =
+            SpannableStringBuilder(context.getString(R.string.alarm_title, item.title))
 
         val contentAdapter = ContentAdapter(holder.itemView.context, categories[position].contents)
         holder.contentRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context)
@@ -95,7 +95,6 @@ class CategoryAdapter(
         })
         holder.binding.btnAddContent.setOnClickListener {
             makeContentItems(position)
-//            notifyItemChanged(position)
         }
 
 

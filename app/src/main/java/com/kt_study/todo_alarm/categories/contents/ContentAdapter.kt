@@ -35,8 +35,8 @@ class ContentAdapter(
         holder.binding.tvAlarmTime.text =
             context.getString(R.string.to_do_time, item.hour, item.min)
 
-        holder.binding.etContent.text = SpannableStringBuilder(context.getString(R.string.to_do, item.toDo))
-
+        holder.binding.etContent.text =
+            SpannableStringBuilder(context.getString(R.string.to_do, item.toDo))
 
         holder.binding.btnAlarm.setOnClickListener {
             alarmClickListener.onAlarmBtnClick(position) { hour, min ->

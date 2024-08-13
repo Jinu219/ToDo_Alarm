@@ -66,7 +66,6 @@ class MainActivity : AppCompatActivity() {
                         toDo = toDo
                     )
                     viewModel.updateContent(updatedContentEntity)
-//                    categoryAdapter.notifyItemChanged(categoryPosition)
                 }
 
                 override fun onTextChange(categoryPosition: Int, title: String) {
@@ -104,7 +103,6 @@ class MainActivity : AppCompatActivity() {
                                 toDo = contentEntity.toDo
                             )
                         viewModel.updateContent(updatedContentEntity)
-//                        categoryAdapter.notifyItemChanged(parentPosition)
                         updateTimeCallBack(selectedHour, selectedMin)
                     }
                     alarmFragment.show(supportFragmentManager, "alarmFragment")

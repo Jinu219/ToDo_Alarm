@@ -4,8 +4,8 @@ interface CategoryAlarmBtnClickListener {
     fun onContentClick(
         parentPosition: Int,
         childPosition: Int,
-        currentHour:Int,
-        currentMin:Int,
+        currentHour: Int,
+        currentMin: Int,
         updateTimeCallBack: (hour: Int, min: Int) -> Unit
     )
 }

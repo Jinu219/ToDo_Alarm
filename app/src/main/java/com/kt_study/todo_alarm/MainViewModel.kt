@@ -65,7 +65,8 @@ class MainViewModel(
             val existingContents = repository.getAllContents.firstOrNull() ?: listOf()
 
             // 새로운 카테고리를 생성합니다.
-            val newCategory = CategoryItem(id = newCategoryId, title = title, contents = mutableListOf())
+            val newCategory =
+                CategoryItem(id = newCategoryId, title = title, contents = mutableListOf())
 
             // 기존 카테고리와 콘텐츠를 포함하여 업데이트된 카테고리 목록을 생성합니다.
             val updatedCategories = existingCategories.map { categoryEntity ->
@@ -158,10 +159,6 @@ class MainViewModel(
             )
         }
     }
-
-
-
-
 
 
     fun clearDatabase() = viewModelScope.launch {
