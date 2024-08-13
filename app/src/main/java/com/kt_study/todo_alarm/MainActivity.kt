@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity() {
             categoryAdapter = CategoryAdapter(categories.toMutableList()) { position ->
                 val categoryId = categories[position].id
                 viewModel.makeContent(position, categoryId, "", 0, 0)
+
             }
 
             categoryAdapter.setTextChangeListener(object : CategoryTextChangeListener {
@@ -50,9 +51,13 @@ class MainActivity : AppCompatActivity() {
                     contentPosition: Int,
                     toDo: String
                 ) {
+                    val categoryId = categories[categoryPosition].id
+                    val contentId = categories[categoryPosition].contents[contentPosition].contentId
                     val contentItem = categoryAdapter.getContentItem(categoryPosition = categoryPosition, contentPosition = contentPosition)
                     val contentEntity = convertToContentEntity(contentItem)
                     val updatedContentEntity = contentEntity.copy(
+                        contentId = contentId,
+                        categoryId = categoryId,
                         toDo = toDo
                     )
                     viewModel.updateContent(updatedContentEntity)
@@ -74,14 +79,16 @@ class MainActivity : AppCompatActivity() {
                         initialHour = contentItem.hour,
                         initialMin = contentItem.min
                     ) { selectedHour, selectedMin ->
+                        val contentId = categories[parentPosition].contents[childPosition].contentId
                         val updatedContentEntity =
                             contentEntity.copy(
+                                contentId = contentId,
                                 hour = selectedHour,
                                 min = selectedMin,
                                 toDo = contentEntity.toDo
                             )
                         viewModel.updateContent(updatedContentEntity)
-                        categoryAdapter.notifyItemChanged(parentPosition)
+//                        categoryAdapter.notifyItemChanged(parentPosition)
                         updateTimeCallBack(selectedHour, selectedMin)
                     }
                     alarmFragment.show(supportFragmentManager, "alarmFragment")
@@ -111,7 +118,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun convertToContentEntity(contentItem: ContentItem): ContentEntity = ContentEntity(
-        id = contentItem.id,
+        contentId = contentItem.contentId,
         categoryId = contentItem.categoryId,
         toDo = contentItem.toDo,
         hour = contentItem.hour,
@@ -119,7 +126,7 @@ class MainActivity : AppCompatActivity() {
     )
 
     fun convertToContentItem(contentEntity: ContentEntity): ContentItem = ContentItem(
-        id = contentEntity.id,
+        contentId = contentEntity.contentId,
         categoryId = contentEntity.categoryId,
         toDo = contentEntity.toDo,
         hour = contentEntity.hour,

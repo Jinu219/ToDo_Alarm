@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "table_content")
 data class ContentEntity(
     @PrimaryKey
-    val id: Int = 0,
+    val contentId: Int = 0,
     val categoryId: Int = 0,
     var toDo: String = "",
     var hour: Int = 0,

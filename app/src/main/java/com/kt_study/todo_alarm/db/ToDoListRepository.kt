@@ -46,6 +46,8 @@ class ToDoListRepository(
         contentDao.deleteAllContents()
     }
 
-
+    fun getContentsByCategoryId(categoryId: Int): Flow<List<ContentEntity>> {
+        return contentDao.getContentsByCategoryId(categoryId)
+    }
 
 }

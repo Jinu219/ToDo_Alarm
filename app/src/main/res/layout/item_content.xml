@@ -22,6 +22,7 @@
         android:background="@null"
         android:fontFamily="@font/nsr"
         android:hint="@string/hint"
+        android:text="@string/to_do"
         android:includeFontPadding="false"
         android:inputType="text"
         android:textSize="20sp"

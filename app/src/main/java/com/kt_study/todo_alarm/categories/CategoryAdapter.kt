@@ -65,7 +65,7 @@ class CategoryAdapter(
             override fun onFocusOut(contentEntity: ContentEntity) {
                 categoryFocusChangeListener.onContentFocusOut(
                     ContentEntity(
-                        id = contentEntity.id,
+                        contentId = contentEntity.contentId,
                         categoryId = categories[holder.adapterPosition].id,
                         toDo = contentEntity.toDo,
                         hour = contentEntity.hour,
@@ -86,7 +86,7 @@ class CategoryAdapter(
         })
         holder.binding.btnAddContent.setOnClickListener {
             makeContentItems(position)
-            notifyItemChanged(position)
+//            notifyItemChanged(position)
         }
 
 

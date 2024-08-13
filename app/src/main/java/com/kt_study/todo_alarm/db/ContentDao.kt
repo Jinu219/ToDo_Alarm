@@ -20,7 +20,11 @@ interface ContentDao {
 
     @Delete
     fun deleteContent(contentEntity: ContentEntity)
+
     @Query("DELETE FROM table_content")
     fun deleteAllContents()
+
+    @Query("SELECT * FROM table_content WHERE categoryId = :categoryId")
+    fun getContentsByCategoryId(categoryId: Int): Flow<List<ContentEntity>>
 
 }

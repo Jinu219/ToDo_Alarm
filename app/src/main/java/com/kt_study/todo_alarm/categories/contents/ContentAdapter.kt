@@ -2,6 +2,7 @@ package com.kt_study.todo_alarm.categories.contents
 
 import android.content.Context
 import android.text.Editable
+import android.text.SpannableStringBuilder
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -31,9 +32,11 @@ class ContentAdapter(
     override fun getItemCount(): Int = contents.size
     override fun onBindViewHolder(holder: ContentViewHolder, position: Int) {
         val item = contents[position]
-
         holder.binding.tvAlarmTime.text =
             context.getString(R.string.to_do_time, item.hour, item.min)
+
+        holder.binding.etContent.text = SpannableStringBuilder(context.getString(R.string.to_do, item.toDo))
+
 
         holder.binding.btnAlarm.setOnClickListener {
             alarmClickListener.onAlarmBtnClick(position) { hour, min ->
@@ -59,10 +62,10 @@ class ContentAdapter(
         holder.binding.etContent.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {
                 val newValue = holder.binding.etContent.text.toString()
-                val contentId = contents[position].id
+                val contentId = contents[position].contentId
                 contentFocusChangeListener.onFocusOut(
                     ContentEntity(
-                        id = contentId,
+                        contentId = contentId,
                         toDo = newValue,
                         hour = item.hour,
                         min = item.min
