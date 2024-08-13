@@ -11,5 +11,5 @@ data class ContentEntity(
     var toDo: String = "",
     var hour: Int = 0,
     var min: Int = 0,
-    var checked: Boolean = false
+    var isChecked: Boolean = false
 )

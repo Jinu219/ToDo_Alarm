@@ -1,12 +1,14 @@
 package com.kt_study.todo_alarm
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.kt_study.todo_alarm.categories.CategoryAdapter
 import com.kt_study.todo_alarm.categories.CategoryAlarmBtnClickListener
+import com.kt_study.todo_alarm.categories.CategoryCheckBoxChangeListener
 import com.kt_study.todo_alarm.categories.CategoryFocusChangeListener
 import com.kt_study.todo_alarm.categories.CategoryItem
 import com.kt_study.todo_alarm.categories.CategoryTextChangeListener
@@ -21,6 +23,7 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var categoryAdapter: CategoryAdapter
+    private var isAlarmSetting = false
     private val viewModel: MainViewModel by viewModels() {
         MainViewModelFactory((application as ToDoApplication).repository)
     }
@@ -41,10 +44,11 @@ class MainActivity : AppCompatActivity() {
             viewModel.clearDatabase()
         }
         viewModel.categories.observe(this) { categories ->
-            categoryAdapter = CategoryAdapter(this, categories.toMutableList()) { position ->
+            categoryAdapter = CategoryAdapter(
+                this,
+                categories.toMutableList()) { position ->
                 val categoryId = categories[position].id
-                viewModel.makeContent(position, categoryId, "", 0, 0)
-
+                viewModel.makeContent(position, categoryId, "", 0, 0, false)
             }
 
             categoryAdapter.setTextChangeListener(object : CategoryTextChangeListener {
@@ -63,7 +67,11 @@ class MainActivity : AppCompatActivity() {
                     val updatedContentEntity = contentEntity.copy(
                         contentId = contentId,
                         categoryId = categoryId,
-                        toDo = toDo
+                        toDo = toDo,
+                        hour = contentEntity.hour,
+                        min = contentEntity.min,
+                        isChecked = contentEntity.isChecked
+
                     )
                     viewModel.updateContent(updatedContentEntity)
                 }
@@ -80,6 +88,25 @@ class MainActivity : AppCompatActivity() {
                 }
             })
 
+            categoryAdapter.setCheckBoxChangeListener(object : CategoryCheckBoxChangeListener{
+                override fun onCheckBoxChanged(
+                    categoryPosition: Int,
+                    contentPosition: Int,
+                    isChecked: Boolean
+                ) {
+                    val contentItem = categoryAdapter.getContentItem(categoryPosition,contentPosition)
+                    val contentEntity = convertToContentEntity(contentItem)
+                    val categoryId = categories[categoryPosition].id
+                    val contentId = contentItem.contentId
+                    val updatedEntity = contentEntity.copy(
+                        categoryId = categoryId,
+                        contentId = contentId,
+                        isChecked = isChecked
+                    )
+                    viewModel.updateContent(updatedEntity)
+                }
+            })
+
             categoryAdapter.setContentClickListener(object : CategoryAlarmBtnClickListener {
                 override fun onContentClick(
                     parentPosition: Int,
@@ -88,6 +115,7 @@ class MainActivity : AppCompatActivity() {
                     currentMin: Int,
                     updateTimeCallBack: (hour: Int, min: Int) -> Unit
                 ) {
+                    isAlarmSetting = true
                     val contentItem = categoryAdapter.getContentItem(parentPosition, childPosition)
                     val contentEntity = convertToContentEntity(contentItem)
                     val alarmFragment = AlarmFragment(
@@ -98,24 +126,28 @@ class MainActivity : AppCompatActivity() {
                         val updatedContentEntity =
                             contentEntity.copy(
                                 contentId = contentId,
+                                toDo = contentItem.toDo,
                                 hour = selectedHour,
                                 min = selectedMin,
-                                toDo = contentEntity.toDo
+                                isChecked = contentItem.isChecked
                             )
                         viewModel.updateContent(updatedContentEntity)
                         updateTimeCallBack(selectedHour, selectedMin)
+                        isAlarmSetting = false
                     }
                     alarmFragment.show(supportFragmentManager, "alarmFragment")
                 }
             })
             categoryAdapter.setFocusChangeListener(
                 object : CategoryFocusChangeListener {
-                    override fun onFocusOut(categoryEntity: CategoryEntity) {
-                        viewModel.updateCategory(categoryEntity)
+                    override fun onFocusOut(categoryItem: CategoryItem) {
+                        val updateCategoryEntity = convertToCategoryEntity(categoryItem)
+                        viewModel.updateCategory(updateCategoryEntity)
                     }
 
-                    override fun onContentFocusOut(contentEntity: ContentEntity) {
-                        viewModel.updateContent(contentEntity)
+                    override fun onContentFocusOut(contentItem: ContentItem) {
+                        val updateContentEntity = convertToContentEntity(contentItem)
+                        viewModel.updateContent(updateContentEntity)
                     }
                 }
             )
@@ -141,7 +173,8 @@ class MainActivity : AppCompatActivity() {
         categoryId = contentItem.categoryId,
         toDo = contentItem.toDo,
         hour = contentItem.hour,
-        min = contentItem.min
+        min = contentItem.min,
+        isChecked = contentItem.isChecked
     )
 
     fun convertToContentItem(contentEntity: ContentEntity): ContentItem = ContentItem(
@@ -149,7 +182,8 @@ class MainActivity : AppCompatActivity() {
         categoryId = contentEntity.categoryId,
         toDo = contentEntity.toDo,
         hour = contentEntity.hour,
-        min = contentEntity.min
+        min = contentEntity.min,
+        isChecked = contentEntity.isChecked
     )
 
 }

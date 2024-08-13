@@ -80,7 +80,8 @@ class MainViewModel(
                                 categoryId = contentEntity.categoryId,
                                 toDo = contentEntity.toDo,
                                 hour = contentEntity.hour,
-                                min = contentEntity.min
+                                min = contentEntity.min,
+                                isChecked = contentEntity.isChecked
                             )
                         }.toMutableList()
                 )
@@ -103,14 +104,15 @@ class MainViewModel(
     }
 
 
-    fun makeContent(categoryPosition: Int, categoryId: Int, toDo: String, hour: Int, min: Int) {
+    fun makeContent(categoryPosition: Int, categoryId: Int, toDo: String, hour: Int, min: Int, isChecked: Boolean) {
         nowContentId++
         val newContent = ContentItem(
             contentId = nowContentId,
             categoryId = categoryId,
             toDo = toDo,
             hour = hour,
-            min = min
+            min = min,
+            isChecked = isChecked
         )
 
         viewModelScope.launch {
@@ -126,7 +128,8 @@ class MainViewModel(
                     categoryId = contentEntity.categoryId,
                     toDo = contentEntity.toDo,
                     hour = contentEntity.hour,
-                    min = contentEntity.min
+                    min = contentEntity.min,
+                    isChecked = contentEntity.isChecked
                 )
             }.toMutableList().apply {
                 add(newContent) // 새 콘텐츠를 리스트에 추가합니다.
@@ -154,7 +157,8 @@ class MainViewModel(
                     categoryId = categoryId,
                     toDo = newContent.toDo,
                     hour = newContent.hour,
-                    min = newContent.min
+                    min = newContent.min,
+                    isChecked = newContent.isChecked
                 )
             )
         }

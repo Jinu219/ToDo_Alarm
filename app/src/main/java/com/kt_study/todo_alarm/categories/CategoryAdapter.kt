@@ -12,12 +12,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.kt_study.todo_alarm.R
 import com.kt_study.todo_alarm.categories.contents.ContentAdapter
 import com.kt_study.todo_alarm.categories.contents.ContentAlarmBtnClickListener
+import com.kt_study.todo_alarm.categories.contents.ContentCheckBoxChangeListener
 import com.kt_study.todo_alarm.categories.contents.ContentFocusChangeListener
 import com.kt_study.todo_alarm.categories.contents.ContentItem
 import com.kt_study.todo_alarm.categories.contents.ContentTextChangeListener
 import com.kt_study.todo_alarm.databinding.ItemCategoryBinding
-import com.kt_study.todo_alarm.db.CategoryEntity
-import com.kt_study.todo_alarm.db.ContentEntity
 
 class CategoryAdapter(
     private val context: Context,
@@ -28,6 +27,7 @@ class CategoryAdapter(
     private lateinit var contentClickListener: CategoryAlarmBtnClickListener
     private lateinit var categoryFocusChangeListener: CategoryFocusChangeListener
     private lateinit var categoryTextChangeListener: CategoryTextChangeListener
+    private lateinit var categoryCheckBoxChangeListener: CategoryCheckBoxChangeListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val binding = ItemCategoryBinding.inflate(
@@ -47,11 +47,21 @@ class CategoryAdapter(
         holder.bind(categories[position])
         val item = categories[position]
         holder.binding.etCategory.text =
-            SpannableStringBuilder(context.getString(R.string.alarm_title, item.title))
+            SpannableStringBuilder(context.getString(R.string.to_do_title, item.title))
 
         val contentAdapter = ContentAdapter(holder.itemView.context, categories[position].contents)
         holder.contentRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context)
         holder.contentRecyclerView.adapter = contentAdapter
+
+        contentAdapter.setCheckBoxChangeListener(object : ContentCheckBoxChangeListener{
+            override fun onCheckBoxChanged(contentItem: ContentItem) {
+                categoryCheckBoxChangeListener.onCheckBoxChanged(
+                    categoryPosition = position,
+                    contentPosition = contentItem.contentId,
+                    isChecked = contentItem.isChecked
+                )
+            }
+        })
 
         contentAdapter.setOnAlarmClickListener(object : ContentAlarmBtnClickListener {
             override fun onAlarmBtnClick(
@@ -71,14 +81,15 @@ class CategoryAdapter(
         })
 
         contentAdapter.setFocusChangeListener(object : ContentFocusChangeListener {
-            override fun onFocusOut(contentEntity: ContentEntity) {
+            override fun onFocusOut(contentItem: ContentItem) {
                 categoryFocusChangeListener.onContentFocusOut(
-                    ContentEntity(
-                        contentId = contentEntity.contentId,
+                    ContentItem(
+                        contentId = contentItem.contentId,
                         categoryId = categories[holder.adapterPosition].id,
-                        toDo = contentEntity.toDo,
-                        hour = contentEntity.hour,
-                        min = contentEntity.min
+                        toDo = contentItem.toDo,
+                        hour = contentItem.hour,
+                        min = contentItem.min,
+                        isChecked = contentItem.isChecked
                     )
                 )
             }
@@ -104,7 +115,7 @@ class CategoryAdapter(
                 val newValue = holder.binding.etCategory.text.toString()
                 val categoryId = categories[position].id
                 categoryFocusChangeListener.onFocusOut(
-                    CategoryEntity(
+                    CategoryItem(
                         id = categoryId,
                         title = newValue
                     )
@@ -130,6 +141,9 @@ class CategoryAdapter(
     }
 
 
+    fun setCheckBoxChangeListener(listener: CategoryCheckBoxChangeListener){
+        categoryCheckBoxChangeListener = listener
+    }
     fun setFocusChangeListener(listener: CategoryFocusChangeListener) {
         categoryFocusChangeListener = listener
     }

@@ -4,13 +4,12 @@ import android.content.Context
 import android.text.Editable
 import android.text.SpannableStringBuilder
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.kt_study.todo_alarm.R
 import com.kt_study.todo_alarm.databinding.ItemContentBinding
-import com.kt_study.todo_alarm.db.ContentEntity
-
 class ContentAdapter(
     private val context: Context,
     private val contents: MutableList<ContentItem>,
@@ -19,6 +18,7 @@ class ContentAdapter(
     private lateinit var alarmClickListener: ContentAlarmBtnClickListener
     private lateinit var contentFocusChangeListener: ContentFocusChangeListener
     private lateinit var textChangeListener: ContentTextChangeListener
+    private lateinit var checkBoxChangeListener: ContentCheckBoxChangeListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
         val binding = ItemContentBinding.inflate(
@@ -31,6 +31,7 @@ class ContentAdapter(
 
     override fun getItemCount(): Int = contents.size
     override fun onBindViewHolder(holder: ContentViewHolder, position: Int) {
+
         val item = contents[position]
         holder.binding.tvAlarmTime.text =
             context.getString(R.string.to_do_time, item.hour, item.min)
@@ -38,13 +39,34 @@ class ContentAdapter(
         holder.binding.etContent.text =
             SpannableStringBuilder(context.getString(R.string.to_do, item.toDo))
 
+        holder.binding.cbCheck.isChecked = item.isChecked
+
+        holder.binding.cbCheck.setOnCheckedChangeListener { _, isChecked ->
+            item.isChecked = isChecked
+            checkBoxChangeListener.onCheckBoxChanged(
+                ContentItem(
+                    contentId = position,
+                    categoryId = item.categoryId,
+                    toDo = item.toDo,
+                    hour = item.hour,
+                    min = item.min,
+                    isChecked = item.isChecked
+                )
+            )
+        }
+
         holder.binding.btnAlarm.setOnClickListener {
+            val currentText = holder.binding.etContent.text.toString()
+            item.toDo = currentText
+
             alarmClickListener.onAlarmBtnClick(position) { hour, min ->
                 item.hour = hour
                 item.min = min
-                notifyItemChanged(position)
+                holder.binding.tvAlarmTime.text =
+                    context.getString(R.string.to_do_time, item.hour, item.min)
             }
         }
+
 
         holder.binding.etContent.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -64,11 +86,13 @@ class ContentAdapter(
                 val newValue = holder.binding.etContent.text.toString()
                 val contentId = contents[position].contentId
                 contentFocusChangeListener.onFocusOut(
-                    ContentEntity(
+                    ContentItem(
                         contentId = contentId,
+                        categoryId = item.categoryId,
                         toDo = newValue,
                         hour = item.hour,
-                        min = item.min
+                        min = item.min,
+                        isChecked = item.isChecked
                     )
                 )
             }
@@ -85,5 +109,8 @@ class ContentAdapter(
 
     fun setOnAlarmClickListener(listener: ContentAlarmBtnClickListener) {
         alarmClickListener = listener
+    }
+    fun setCheckBoxChangeListener(listener: ContentCheckBoxChangeListener) {
+        checkBoxChangeListener = listener
     }
 }
