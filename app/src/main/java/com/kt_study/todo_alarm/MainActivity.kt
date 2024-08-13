@@ -8,9 +8,11 @@ import androidx.lifecycle.lifecycleScope
 import com.kt_study.todo_alarm.categories.CategoryAdapter
 import com.kt_study.todo_alarm.categories.CategoryAlarmBtnClickListener
 import com.kt_study.todo_alarm.categories.CategoryFocusChangeListener
+import com.kt_study.todo_alarm.categories.CategoryItem
 import com.kt_study.todo_alarm.categories.CategoryTextChangeListener
 import com.kt_study.todo_alarm.categories.contents.ContentItem
 import com.kt_study.todo_alarm.databinding.ActivityMainBinding
+import com.kt_study.todo_alarm.db.CategoryDao
 import com.kt_study.todo_alarm.db.CategoryEntity
 import com.kt_study.todo_alarm.db.ContentEntity
 import kotlinx.coroutines.launch
@@ -53,7 +55,10 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     val categoryId = categories[categoryPosition].id
                     val contentId = categories[categoryPosition].contents[contentPosition].contentId
-                    val contentItem = categoryAdapter.getContentItem(categoryPosition = categoryPosition, contentPosition = contentPosition)
+                    val contentItem = categoryAdapter.getContentItem(
+                        categoryPosition = categoryPosition,
+                        contentPosition = contentPosition
+                    )
                     val contentEntity = convertToContentEntity(contentItem)
                     val updatedContentEntity = contentEntity.copy(
                         contentId = contentId,
@@ -62,6 +67,17 @@ class MainActivity : AppCompatActivity() {
                     )
                     viewModel.updateContent(updatedContentEntity)
 //                    categoryAdapter.notifyItemChanged(categoryPosition)
+                }
+
+                override fun onTextChange(categoryPosition: Int, title: String) {
+                    val categoryId = categories[categoryPosition].id
+                    val categoryItem = categories[categoryPosition]
+                    val categoryEntity = convertToCategoryEntity(categoryItem)
+                    val updatedCategoryEntity = categoryEntity.copy(
+                        id = categoryId,
+                        title = title
+                    )
+                    viewModel.updateCategory(updatedCategoryEntity)
                 }
             })
 
@@ -116,6 +132,11 @@ class MainActivity : AppCompatActivity() {
             viewModel.makeCategory("")
         }
     }
+
+    fun convertToCategoryEntity(categoryItem: CategoryItem): CategoryEntity = CategoryEntity(
+        id = categoryItem.id,
+        title = categoryItem.title
+    )
 
     fun convertToContentEntity(contentItem: ContentItem): ContentEntity = ContentEntity(
         contentId = contentItem.contentId,
