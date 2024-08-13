@@ -1,12 +1,17 @@
 package com.kt_study.todo_alarm.categories.contents
 
 import android.content.Context
+import android.graphics.Color
 import android.text.Editable
+import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.TextWatcher
+import android.text.style.ForegroundColorSpan
+import android.text.style.StrikethroughSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.EditText
 import androidx.recyclerview.widget.RecyclerView
 import com.kt_study.todo_alarm.R
 import com.kt_study.todo_alarm.databinding.ItemContentBinding
@@ -38,10 +43,12 @@ class ContentAdapter(
 
         holder.binding.etContent.text =
             SpannableStringBuilder(context.getString(R.string.to_do, item.toDo))
-
+        updateEditTextStyle(holder.binding.etContent, item.isChecked, holder.binding.etContent.text.toString())
         holder.binding.cbCheck.isChecked = item.isChecked
 
         holder.binding.cbCheck.setOnCheckedChangeListener { _, isChecked ->
+            val currentText = holder.binding.etContent.text.toString()
+            item.toDo = currentText
             item.isChecked = isChecked
             checkBoxChangeListener.onCheckBoxChanged(
                 ContentItem(
@@ -53,6 +60,7 @@ class ContentAdapter(
                     isChecked = item.isChecked
                 )
             )
+            updateEditTextStyle(holder.binding.etContent, item.isChecked, holder.binding.etContent.text.toString())
         }
 
         holder.binding.btnAlarm.setOnClickListener {
@@ -69,6 +77,7 @@ class ContentAdapter(
 
 
         holder.binding.etContent.addTextChangedListener(object : TextWatcher {
+
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -98,6 +107,26 @@ class ContentAdapter(
             }
         }
     }
+
+    private fun updateEditTextStyle(editText: EditText, isChecked: Boolean, text: String) {
+        val spannable = SpannableStringBuilder(text)
+        if (isChecked) {
+            val length = spannable.length
+            spannable.setSpan(StrikethroughSpan(), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannable.setSpan(ForegroundColorSpan(Color.GRAY), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        } else {
+            val strikethroughSpans = spannable.getSpans(0, spannable.length, StrikethroughSpan::class.java)
+            for (span in strikethroughSpans) {
+                spannable.removeSpan(span)
+            }
+            val colorSpans = spannable.getSpans(0, spannable.length, ForegroundColorSpan::class.java)
+            for (span in colorSpans) {
+                spannable.removeSpan(span)
+            }
+        }
+        editText.text = spannable
+    }
+
 
     fun setFocusChangeListener(listener: ContentFocusChangeListener) {
         contentFocusChangeListener = listener
