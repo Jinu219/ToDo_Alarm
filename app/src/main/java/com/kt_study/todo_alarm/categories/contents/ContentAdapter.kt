@@ -1,6 +1,8 @@
 package com.kt_study.todo_alarm.categories.contents
 
 import android.content.Context
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -15,6 +17,7 @@ class ContentAdapter(
     RecyclerView.Adapter<ContentViewHolder>() {
     private lateinit var alarmClickListener: ContentAlarmBtnClickListener
     private lateinit var contentFocusChangeListener: ContentFocusChangeListener
+    private lateinit var textChangeListener: ContentTextChangeListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
         val binding = ItemContentBinding.inflate(
@@ -40,6 +43,19 @@ class ContentAdapter(
             }
         }
 
+        holder.binding.etContent.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s != null) {
+                    textChangeListener.onTextChange(holder.adapterPosition, s.toString())
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+
         holder.binding.etContent.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {
                 val newValue = holder.binding.etContent.text.toString()
@@ -58,6 +74,10 @@ class ContentAdapter(
 
     fun setFocusChangeListener(listener: ContentFocusChangeListener) {
         contentFocusChangeListener = listener
+    }
+
+    fun setTextChangeListener(listener: ContentTextChangeListener) {
+        textChangeListener = listener
     }
 
     fun setOnAlarmClickListener(listener: ContentAlarmBtnClickListener) {
