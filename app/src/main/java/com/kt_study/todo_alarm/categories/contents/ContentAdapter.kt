@@ -74,6 +74,7 @@ class ContentAdapter(
             )
         }
 
+
         holder.binding.btnAlarm.setOnClickListener {
             val currentText = holder.binding.etContent.text.toString()
             item.toDo = currentText
@@ -118,17 +119,27 @@ class ContentAdapter(
             }
         }
 
-    }
-    val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
-        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-            return false
-        }
 
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            val position = viewHolder.adapterPosition
-            deleteItem(position)
-        }
     }
+
+    val itemTouchHelperCallback =
+        object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                when (direction) {
+                    ItemTouchHelper.LEFT -> deleteItem(position)
+                    ItemTouchHelper.RIGHT -> Log.d("SwipeRight","Alarm")
+                }
+            }
+        }
     fun deleteItem(position: Int) {
         if (position < contents.size) {
             val deletedItem = contents[position]
