@@ -101,17 +101,6 @@ class ContentAdapter(
                 )
             }
         }
-        holder.binding.btnAlarm.setOnClickListener {
-            val currentText = holder.binding.etContent.text.toString()
-            item.toDo = currentText
-
-            alarmClickListener.onAlarmBtnClick(position) { hour, min ->
-                item.hour = hour
-                item.min = min
-                holder.binding.tvAlarmTime.text =
-                    context.getString(R.string.to_do_time, item.hour, item.min)
-            }
-        }
 
         holder.textWatcher?.let { holder.binding.etContent.removeTextChangedListener(it) }
         val textWatcher = object : TextWatcher {
@@ -164,13 +153,19 @@ class ContentAdapter(
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
                 if (position != RecyclerView.NO_POSITION && position < contents.size) {
+                    val item = contents[position]  // 현재 스와이프된 아이템
                     when (direction) {
                         ItemTouchHelper.LEFT -> {
                             isSwiping = true
                             deleteItem(position)
                         }
 
-                        ItemTouchHelper.RIGHT -> Log.d("SwipeRight", "Alarm")
+                        ItemTouchHelper.RIGHT -> {
+                            isSwiping = true
+                            val contentViewHolder = viewHolder as ContentViewHolder
+                            triggerAlarm(contentViewHolder, position, item)
+                            notifyItemChanged(position)
+                        }
                     }
                 }
                 isSwiping = false
@@ -202,6 +197,12 @@ class ContentAdapter(
                     )
                     editBackground?.draw(c)
                     editIcon?.draw(c)
+
+                    val textToShow = "알람"
+                    val textX = itemView.left + dX - 120
+                    val textY = itemView.top + (itemView.height / 2) + (textPaint.textSize / 2)
+                    c.drawText(textToShow, textX, textY, textPaint)
+
                 } else if (dX < 0) { // 스와이프 왼쪽
                     deleteIcon?.setBounds(
                         itemView.right - iconMargin - iconSize,
@@ -251,6 +252,19 @@ class ContentAdapter(
 
         // 삭제된 아이템의 정보를 삭제 리스너에 전달
         contentDeleteListener.onContentDelete(deletedItem)
+    }
+
+    private fun triggerAlarm(holder: ContentViewHolder, position: Int, item: ContentItem) {
+        val currentText = holder.binding.etContent.text.toString()
+        item.toDo = currentText
+
+        alarmClickListener.onAlarmBtnClick(position) { hour, min ->
+            item.hour = hour
+            item.min = min
+            holder.binding.tvAlarmTime.text =
+                context.getString(R.string.to_do_time, item.hour, item.min)
+            notifyItemChanged(position)
+        }
     }
 
     private fun updateEditTextStyle(editText: EditText, isChecked: Boolean, text: String) {
