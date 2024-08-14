@@ -39,6 +39,14 @@ class ToDoListRepository(
         contentDao.updateContent(content)
     }
 
+    // Delete
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun deleteContent(content: ContentEntity) {
+        contentDao.deleteContent(content)
+    }
+
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun clearDatabase() {

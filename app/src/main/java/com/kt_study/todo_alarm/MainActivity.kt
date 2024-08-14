@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.kt_study.todo_alarm.categories.CategoryAdapter
 import com.kt_study.todo_alarm.categories.CategoryAlarmBtnClickListener
 import com.kt_study.todo_alarm.categories.CategoryCheckBoxChangeListener
+import com.kt_study.todo_alarm.categories.CategoryContentDeleteListener
 import com.kt_study.todo_alarm.categories.CategoryFocusChangeListener
 import com.kt_study.todo_alarm.categories.CategoryItem
 import com.kt_study.todo_alarm.categories.CategoryTextChangeListener
@@ -50,6 +51,13 @@ class MainActivity : AppCompatActivity() {
                 val categoryId = categories[position].id
                 viewModel.makeContent(position, categoryId, "", 0, 0, false)
             }
+
+            categoryAdapter.setCategoryContentDeleteListener(object : CategoryContentDeleteListener{
+                override fun onContentDelete(categoryPosition: Int, contentItem: ContentItem) {
+                    val contentEntity = convertToContentEntity(contentItem)
+                    viewModel.deleteContent(contentEntity)
+                }
+            })
 
             categoryAdapter.setTextChangeListener(object : CategoryTextChangeListener {
                 override fun onContentTextChange(

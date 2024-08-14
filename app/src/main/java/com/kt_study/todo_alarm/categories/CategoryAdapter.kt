@@ -7,12 +7,14 @@ import android.text.SpannableStringBuilder
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kt_study.todo_alarm.R
 import com.kt_study.todo_alarm.categories.contents.ContentAdapter
 import com.kt_study.todo_alarm.categories.contents.ContentAlarmBtnClickListener
 import com.kt_study.todo_alarm.categories.contents.ContentCheckBoxChangeListener
+import com.kt_study.todo_alarm.categories.contents.ContentDeleteListener
 import com.kt_study.todo_alarm.categories.contents.ContentFocusChangeListener
 import com.kt_study.todo_alarm.categories.contents.ContentItem
 import com.kt_study.todo_alarm.categories.contents.ContentTextChangeListener
@@ -28,6 +30,7 @@ class CategoryAdapter(
     private lateinit var categoryFocusChangeListener: CategoryFocusChangeListener
     private lateinit var categoryTextChangeListener: CategoryTextChangeListener
     private lateinit var categoryCheckBoxChangeListener: CategoryCheckBoxChangeListener
+    private lateinit var categoryContentDeleteListener: CategoryContentDeleteListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val binding = ItemCategoryBinding.inflate(
@@ -104,6 +107,16 @@ class CategoryAdapter(
                 )
             }
         })
+
+        val itemTouchHelper = ItemTouchHelper(contentAdapter.itemTouchHelperCallback)
+        itemTouchHelper.attachToRecyclerView(holder.contentRecyclerView)
+
+        contentAdapter.setContentDeleteListener(object : ContentDeleteListener {
+            override fun onContentDelete(contentItem: ContentItem) {
+                categoryContentDeleteListener.onContentDelete(position, contentItem)
+            }
+        })
+
         holder.binding.btnAddContent.setOnClickListener {
             makeContentItems(position)
         }
@@ -154,5 +167,8 @@ class CategoryAdapter(
 
     fun setContentClickListener(listener: CategoryAlarmBtnClickListener) {
         contentClickListener = listener
+    }
+    fun setCategoryContentDeleteListener(listener: CategoryContentDeleteListener) {
+        categoryContentDeleteListener = listener
     }
 }

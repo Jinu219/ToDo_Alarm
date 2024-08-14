@@ -12,9 +12,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.kt_study.todo_alarm.R
 import com.kt_study.todo_alarm.databinding.ItemContentBinding
+
 class ContentAdapter(
     private val context: Context,
     private val contents: MutableList<ContentItem>,
@@ -24,6 +26,7 @@ class ContentAdapter(
     private lateinit var contentFocusChangeListener: ContentFocusChangeListener
     private lateinit var textChangeListener: ContentTextChangeListener
     private lateinit var checkBoxChangeListener: ContentCheckBoxChangeListener
+    private lateinit var contentDeleteListener: ContentDeleteListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
         val binding = ItemContentBinding.inflate(
@@ -43,7 +46,11 @@ class ContentAdapter(
 
         holder.binding.etContent.text =
             SpannableStringBuilder(context.getString(R.string.to_do, item.toDo))
-        updateEditTextStyle(holder.binding.etContent, item.isChecked, holder.binding.etContent.text.toString())
+        updateEditTextStyle(
+            holder.binding.etContent,
+            item.isChecked,
+            holder.binding.etContent.text.toString()
+        )
         holder.binding.cbCheck.isChecked = item.isChecked
 
         holder.binding.cbCheck.setOnCheckedChangeListener { _, isChecked ->
@@ -60,7 +67,11 @@ class ContentAdapter(
                     isChecked = item.isChecked
                 )
             )
-            updateEditTextStyle(holder.binding.etContent, item.isChecked, holder.binding.etContent.text.toString())
+            updateEditTextStyle(
+                holder.binding.etContent,
+                item.isChecked,
+                holder.binding.etContent.text.toString()
+            )
         }
 
         holder.binding.btnAlarm.setOnClickListener {
@@ -106,6 +117,25 @@ class ContentAdapter(
                 )
             }
         }
+
+    }
+    val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+            return false
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            val position = viewHolder.adapterPosition
+            deleteItem(position)
+        }
+    }
+    fun deleteItem(position: Int) {
+        if (position < contents.size) {
+            val deletedItem = contents[position]
+            contents.removeAt(position)
+            notifyItemRemoved(position)
+            contentDeleteListener.onContentDelete(deletedItem)
+        }
     }
 
     private fun updateEditTextStyle(editText: EditText, isChecked: Boolean, text: String) {
@@ -113,13 +143,20 @@ class ContentAdapter(
         if (isChecked) {
             val length = spannable.length
             spannable.setSpan(StrikethroughSpan(), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            spannable.setSpan(ForegroundColorSpan(Color.GRAY), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannable.setSpan(
+                ForegroundColorSpan(Color.GRAY),
+                0,
+                length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         } else {
-            val strikethroughSpans = spannable.getSpans(0, spannable.length, StrikethroughSpan::class.java)
+            val strikethroughSpans =
+                spannable.getSpans(0, spannable.length, StrikethroughSpan::class.java)
             for (span in strikethroughSpans) {
                 spannable.removeSpan(span)
             }
-            val colorSpans = spannable.getSpans(0, spannable.length, ForegroundColorSpan::class.java)
+            val colorSpans =
+                spannable.getSpans(0, spannable.length, ForegroundColorSpan::class.java)
             for (span in colorSpans) {
                 spannable.removeSpan(span)
             }
@@ -139,7 +176,12 @@ class ContentAdapter(
     fun setOnAlarmClickListener(listener: ContentAlarmBtnClickListener) {
         alarmClickListener = listener
     }
+
     fun setCheckBoxChangeListener(listener: ContentCheckBoxChangeListener) {
         checkBoxChangeListener = listener
+    }
+
+    fun setContentDeleteListener(listener: ContentDeleteListener) {
+        contentDeleteListener = listener
     }
 }

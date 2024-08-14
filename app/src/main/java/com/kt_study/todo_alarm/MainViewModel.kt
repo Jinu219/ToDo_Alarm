@@ -53,6 +53,11 @@ class MainViewModel(
         }
     }
 
+    fun deleteContent(content: ContentEntity) = viewModelScope.launch{
+        withContext(Dispatchers.IO) {
+            repository.deleteContent(content)
+        }
+    }
 
     // RecyclerView
     fun makeCategory(title: String) {
@@ -170,4 +175,5 @@ class MainViewModel(
             repository.clearDatabase()
         }
     }
+
 }
