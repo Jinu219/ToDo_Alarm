@@ -25,13 +25,27 @@ import com.kt_study.todo_alarm.databinding.ItemContentBinding
 class ContentAdapter(
     private val context: Context,
     private val contents: MutableList<ContentItem>,
-) :
-    RecyclerView.Adapter<ContentViewHolder>() {
+) : RecyclerView.Adapter<ContentViewHolder>() {
+
     private lateinit var alarmClickListener: ContentAlarmBtnClickListener
     private lateinit var contentFocusChangeListener: ContentFocusChangeListener
     private lateinit var textChangeListener: ContentTextChangeListener
     private lateinit var checkBoxChangeListener: ContentCheckBoxChangeListener
     private lateinit var contentDeleteListener: ContentDeleteListener
+
+    // 아이콘과 배경색 설정
+    private val deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_delete)
+    private val editIcon = ContextCompat.getDrawable(context, R.drawable.ic_edit)
+    private val iconSize = 50 // dp를 px로 변환해야 합니다
+    private val deleteBackground = ColorDrawable(Color.parseColor("#ff4545"))
+    private val editBackground = ColorDrawable(Color.BLUE)
+    private val textPaint = Paint().apply {
+        color = Color.WHITE
+        textSize = context.resources.getDimensionPixelSize(R.dimen.swipe_text_size).toFloat()
+        textAlign = Paint.Align.RIGHT
+        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+    }
+    private var isSwiping = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
         val binding = ItemContentBinding.inflate(
@@ -43,7 +57,12 @@ class ContentAdapter(
     }
 
     override fun getItemCount(): Int = contents.size
+
     override fun onBindViewHolder(holder: ContentViewHolder, position: Int) {
+        if (position < 0 || position >= contents.size) {
+            Log.e("ContentAdapter", "Invalid position: $position")
+            return
+        }
 
         val item = contents[position]
         holder.binding.tvAlarmTime.text =
@@ -51,35 +70,37 @@ class ContentAdapter(
 
         holder.binding.etContent.text =
             SpannableStringBuilder(context.getString(R.string.to_do, item.toDo))
+
         updateEditTextStyle(
             holder.binding.etContent,
             item.isChecked,
             holder.binding.etContent.text.toString()
         )
+
         holder.binding.cbCheck.isChecked = item.isChecked
 
         holder.binding.cbCheck.setOnCheckedChangeListener { _, isChecked ->
             val currentText = holder.binding.etContent.text.toString()
             item.toDo = currentText
             item.isChecked = isChecked
-            checkBoxChangeListener.onCheckBoxChanged(
-                ContentItem(
-                    contentId = position,
-                    categoryId = item.categoryId,
-                    toDo = item.toDo,
-                    hour = item.hour,
-                    min = item.min,
-                    isChecked = item.isChecked
+            if (!isSwiping) {
+                checkBoxChangeListener.onCheckBoxChanged(
+                    ContentItem(
+                        contentId = position,
+                        categoryId = item.categoryId,
+                        toDo = item.toDo,
+                        hour = item.hour,
+                        min = item.min,
+                        isChecked = item.isChecked
+                    )
                 )
-            )
-            updateEditTextStyle(
-                holder.binding.etContent,
-                item.isChecked,
-                holder.binding.etContent.text.toString()
-            )
+                updateEditTextStyle(
+                    holder.binding.etContent,
+                    item.isChecked,
+                    holder.binding.etContent.text.toString()
+                )
+            }
         }
-
-
         holder.binding.btnAlarm.setOnClickListener {
             val currentText = holder.binding.etContent.text.toString()
             item.toDo = currentText
@@ -92,39 +113,42 @@ class ContentAdapter(
             }
         }
 
-
-        holder.binding.etContent.addTextChangedListener(object : TextWatcher {
-
+        holder.textWatcher?.let { holder.binding.etContent.removeTextChangedListener(it) }
+        val textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s != null) {
-                    textChangeListener.onTextChange(holder.adapterPosition, s.toString())
+                if (!isSwiping) {
+                    s?.let {
+                        // Adapter의 position과 텍스트를 전달하여 변경 사항을 알립니다.
+                        textChangeListener.onTextChange(holder.adapterPosition, it.toString())
+                    }
                 }
             }
 
             override fun afterTextChanged(s: Editable?) {}
-        })
+        }
+        holder.binding.etContent.addTextChangedListener(textWatcher)
+        holder.textWatcher = textWatcher
 
-
-        holder.binding.etContent.setOnFocusChangeListener { v, hasFocus ->
+        holder.binding.etContent.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
                 val newValue = holder.binding.etContent.text.toString()
-                val contentId = contents[position].contentId
-                contentFocusChangeListener.onFocusOut(
-                    ContentItem(
-                        contentId = contentId,
-                        categoryId = item.categoryId,
-                        toDo = newValue,
-                        hour = item.hour,
-                        min = item.min,
-                        isChecked = item.isChecked
+                val contentId = contents.getOrNull(position)?.contentId
+                if (contentId != null) {
+                    contentFocusChangeListener.onFocusOut(
+                        ContentItem(
+                            contentId = contentId,
+                            categoryId = item.categoryId,
+                            toDo = newValue,
+                            hour = item.hour,
+                            min = item.min,
+                            isChecked = item.isChecked
+                        )
                     )
-                )
+                }
             }
         }
-
-
     }
 
     val itemTouchHelperCallback =
@@ -139,10 +163,17 @@ class ContentAdapter(
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-                when (direction) {
-                    ItemTouchHelper.LEFT -> deleteItem(position)
-                    ItemTouchHelper.RIGHT -> Log.d("SwipeRight", "Alarm")
+                if (position != RecyclerView.NO_POSITION && position < contents.size) {
+                    when (direction) {
+                        ItemTouchHelper.LEFT -> {
+                            isSwiping = true
+                            deleteItem(position)
+                        }
+
+                        ItemTouchHelper.RIGHT -> Log.d("SwipeRight", "Alarm")
+                    }
                 }
+                isSwiping = false
             }
 
             override fun onChildDraw(
@@ -155,9 +186,9 @@ class ContentAdapter(
                 isCurrentlyActive: Boolean
             ) {
                 val itemView = viewHolder.itemView
-                val iconMargin = (itemView.width - iconSize) / 2
+                val iconMargin = (itemView.height - iconSize) / 2
 
-                if (dX > 0) { // Swiping to the right
+                if (dX > 0) { // 스와이프 오른쪽
                     editIcon?.setBounds(
                         itemView.left + iconMargin,
                         itemView.top + iconMargin,
@@ -171,7 +202,7 @@ class ContentAdapter(
                     )
                     editBackground?.draw(c)
                     editIcon?.draw(c)
-                } else if (dX < 0) { // Swiping to the left
+                } else if (dX < 0) { // 스와이프 왼쪽
                     deleteIcon?.setBounds(
                         itemView.right - iconMargin - iconSize,
                         itemView.top + iconMargin,
@@ -187,12 +218,14 @@ class ContentAdapter(
                     deleteBackground?.draw(c)
                     deleteIcon?.draw(c)
 
-                    // Text "삭제" slides with the swipe
+                    // "삭제" 텍스트 그리기
                     val textToShow = "삭제"
                     val textX = itemView.right + dX + 120
                     val textY = itemView.top + (itemView.height / 2) + (textPaint.textSize / 2)
                     c.drawText(textToShow, textX, textY, textPaint)
                 }
+
+                isSwiping = isCurrentlyActive
 
                 super.onChildDraw(
                     c,
@@ -206,28 +239,18 @@ class ContentAdapter(
             }
         }
 
-    // 아이콘과 배경색 설정
-    private val deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_delete)
-    private val editIcon = ContextCompat.getDrawable(context, R.drawable.ic_edit)
-    private val iconSize = 50 // dp를 px로 변환해야 합니다
-    private val deleteBackground = ColorDrawable(Color.parseColor("#ff4545"))
-    private val editBackground = ColorDrawable(Color.BLUE)
-    private val textPaint = Paint().apply {
-        color = Color.WHITE
-        textSize =
-            context.resources.getDimensionPixelSize(R.dimen.swipe_text_size).toFloat()
-        textAlign = Paint.Align.RIGHT
-        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-    }
-
-
     fun deleteItem(position: Int) {
-        if (position < contents.size) {
-            val deletedItem = contents[position]
-            contents.removeAt(position)
-            notifyItemRemoved(position)
-            contentDeleteListener.onContentDelete(deletedItem)
+        if (position < 0 || position >= contents.size) {
+            Log.e("ContentAdapter", "Invalid position: $position")
+            return
         }
+
+        val deletedItem = contents[position]
+        contents.removeAt(position) // 데이터 리스트에서 아이템 삭제
+        notifyItemRemoved(position) // RecyclerView에 삭제된 아이템 알리기
+
+        // 삭제된 아이템의 정보를 삭제 리스너에 전달
+        contentDeleteListener.onContentDelete(deletedItem)
     }
 
     private fun updateEditTextStyle(editText: EditText, isChecked: Boolean, text: String) {
@@ -249,11 +272,11 @@ class ContentAdapter(
         } else {
             val strikethroughSpans =
                 spannable.getSpans(0, spannable.length, StrikethroughSpan::class.java)
+            val colorSpans =
+                spannable.getSpans(0, spannable.length, ForegroundColorSpan::class.java)
             for (span in strikethroughSpans) {
                 spannable.removeSpan(span)
             }
-            val colorSpans =
-                spannable.getSpans(0, spannable.length, ForegroundColorSpan::class.java)
             for (span in colorSpans) {
                 spannable.removeSpan(span)
             }
