@@ -27,4 +27,7 @@ interface ContentDao {
     @Query("SELECT * FROM table_content WHERE categoryId = :categoryId")
     fun getContentsByCategoryId(categoryId: Int): Flow<List<ContentEntity>>
 
+    @Query("SELECT MAX(contentId) FROM table_content")
+    suspend fun getMaxContentId(): Int?
+
 }

@@ -15,6 +15,9 @@ interface CategoryDao {
     @Query("DELETE FROM table_category")
     fun deleteAllCategories()
 
+    @Query("SELECT MAX(id) FROM table_category")
+    suspend fun getMaxCategoryId(): Int?
+
     @Insert
     fun insertCategory(categoryEntity: CategoryEntity)
 

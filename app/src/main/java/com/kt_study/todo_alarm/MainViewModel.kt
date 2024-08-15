@@ -3,7 +3,6 @@ package com.kt_study.todo_alarm
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.kt_study.todo_alarm.categories.CategoryItem
 import com.kt_study.todo_alarm.categories.contents.ContentItem
@@ -16,16 +15,56 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainViewModel(
-    private val repository: ToDoListRepository
+    private val application: ToDoApplication,
+    private var repository: ToDoListRepository
 ) : ViewModel() {
 
     private val _categories = MutableLiveData<List<CategoryItem>>(/* value = */ listOf())
     val categories: LiveData<List<CategoryItem>> get() = _categories
-    private var nowCategoryId = 1
-    private var nowContentId = 1
 
-    val getAllCategories: LiveData<List<CategoryEntity>> = repository.getAllCategories.asLiveData()
-    val getAllContents: LiveData<List<ContentEntity>> = repository.getAllContents.asLiveData()
+    init {
+        // ViewModel 초기화 시 데이터 로드 및 변환
+        viewModelScope.launch {
+            // 데이터베이스에서 모든 카테고리와 콘텐츠를 가져옵니다.
+            val categoriesFromDb = repository.getAllCategories.firstOrNull() ?: listOf()
+            val contentsFromDb = repository.getAllContents.firstOrNull() ?: listOf()
+
+            // 카테고리와 콘텐츠를 UI에 적합한 형식으로 변환합니다.
+            val categoryItems = categoriesFromDb.map { categoryEntity ->
+                // 해당 카테고리에 속하는 콘텐츠를 필터링하고 변환합니다.
+                val contentItems = contentsFromDb.filter { it.categoryId == categoryEntity.id }
+                    .map { contentEntity ->
+                        ContentItem(
+                            contentId = contentEntity.contentId,
+                            categoryId = contentEntity.categoryId,
+                            toDo = contentEntity.toDo,
+                            hour = contentEntity.hour,
+                            min = contentEntity.min,
+                            isChecked = contentEntity.isChecked
+                        )
+                    }.toMutableList()
+
+                CategoryItem(
+                    id = categoryEntity.id,
+                    title = categoryEntity.title,
+                    contents = contentItems
+                )
+            }
+
+            // 변환된 데이터를 LiveData에 설정합니다.
+            _categories.value = categoryItems
+        }
+    }
+
+    private suspend fun getNextCategoryId(): Int {
+        val maxCategoryId = repository.getMaxCategoryId() ?: 0
+        return maxCategoryId + 1
+    }
+
+    private suspend fun getNextContentId(): Int {
+        val maxContentId = repository.getMaxContentId() ?: 0
+        return maxContentId + 1
+    }
 
     // DB Insert Value
     private fun insertCategory(category: CategoryEntity) = viewModelScope.launch {
@@ -53,7 +92,7 @@ class MainViewModel(
         }
     }
 
-    fun deleteContent(content: ContentEntity) = viewModelScope.launch{
+    fun deleteContent(content: ContentEntity) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
             repository.deleteContent(content)
         }
@@ -61,10 +100,8 @@ class MainViewModel(
 
     // RecyclerView
     fun makeCategory(title: String) {
-        nowCategoryId++
-        val newCategoryId = nowCategoryId
-
         viewModelScope.launch {
+            val newCategoryId = getNextCategoryId()
             // 기존 카테고리 및 콘텐츠를 가져옵니다.
             val existingCategories = repository.getAllCategories.firstOrNull() ?: listOf()
             val existingContents = repository.getAllContents.firstOrNull() ?: listOf()
@@ -109,19 +146,27 @@ class MainViewModel(
     }
 
 
-    fun makeContent(categoryPosition: Int, categoryId: Int, toDo: String, hour: Int, min: Int, isChecked: Boolean) {
-        nowContentId++
-        val newContent = ContentItem(
-            contentId = nowContentId,
-            categoryId = categoryId,
-            toDo = toDo,
-            hour = hour,
-            min = min,
-            isChecked = isChecked
-        )
+    fun makeContent(
+        categoryPosition: Int,
+        categoryId: Int,
+        toDo: String,
+        hour: Int,
+        min: Int,
+        isChecked: Boolean
+    ) {
 
         viewModelScope.launch {
+
+            val newContentId = getNextContentId()
             // 현재 카테고리에 속한 기존 콘텐츠를 가져옵니다.
+            val newContent = ContentItem(
+                contentId = newContentId,
+                categoryId = categoryId,
+                toDo = toDo,
+                hour = hour,
+                min = min,
+                isChecked = isChecked
+            )
             val existingContents = withContext(Dispatchers.IO) {
                 repository.getContentsByCategoryId(categoryId).firstOrNull() ?: listOf()
             }

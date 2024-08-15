@@ -1,11 +1,9 @@
 package com.kt_study.todo_alarm
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import com.kt_study.todo_alarm.categories.CategoryAdapter
 import com.kt_study.todo_alarm.categories.CategoryAlarmBtnClickListener
 import com.kt_study.todo_alarm.categories.CategoryCheckBoxChangeListener
@@ -15,18 +13,19 @@ import com.kt_study.todo_alarm.categories.CategoryItem
 import com.kt_study.todo_alarm.categories.CategoryTextChangeListener
 import com.kt_study.todo_alarm.categories.contents.ContentItem
 import com.kt_study.todo_alarm.databinding.ActivityMainBinding
-import com.kt_study.todo_alarm.db.CategoryDao
 import com.kt_study.todo_alarm.db.CategoryEntity
 import com.kt_study.todo_alarm.db.ContentEntity
-import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var categoryAdapter: CategoryAdapter
     private var isAlarmSetting = false
-    private val viewModel: MainViewModel by viewModels() {
-        MainViewModelFactory((application as ToDoApplication).repository)
+    private val viewModel: MainViewModel by viewModels {
+        MainViewModelFactory(
+            application as ToDoApplication,
+            (application as ToDoApplication).repository
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,18 +40,17 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun initObserve() {
-        lifecycleScope.launch {
-            viewModel.clearDatabase()
-        }
         viewModel.categories.observe(this) { categories ->
             categoryAdapter = CategoryAdapter(
                 this,
-                categories.toMutableList()) { position ->
+                categories.toMutableList()
+            ) { position ->
                 val categoryId = categories[position].id
                 viewModel.makeContent(position, categoryId, "", 0, 0, false)
             }
 
-            categoryAdapter.setCategoryContentDeleteListener(object : CategoryContentDeleteListener{
+            categoryAdapter.setCategoryContentDeleteListener(object :
+                CategoryContentDeleteListener {
                 override fun onContentDelete(categoryPosition: Int, contentItem: ContentItem) {
                     val contentEntity = convertToContentEntity(contentItem)
                     viewModel.deleteContent(contentEntity)
@@ -96,13 +94,14 @@ class MainActivity : AppCompatActivity() {
                 }
             })
 
-            categoryAdapter.setCheckBoxChangeListener(object : CategoryCheckBoxChangeListener{
+            categoryAdapter.setCheckBoxChangeListener(object : CategoryCheckBoxChangeListener {
                 override fun onCheckBoxChanged(
                     categoryPosition: Int,
                     contentPosition: Int,
                     isChecked: Boolean
                 ) {
-                    val contentItem = categoryAdapter.getContentItem(categoryPosition,contentPosition)
+                    val contentItem =
+                        categoryAdapter.getContentItem(categoryPosition, contentPosition)
                     val contentEntity = convertToContentEntity(contentItem)
                     val categoryId = categories[categoryPosition].id
                     val contentId = contentItem.contentId
