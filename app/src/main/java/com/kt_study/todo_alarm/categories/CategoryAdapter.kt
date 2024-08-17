@@ -15,7 +15,6 @@ import com.kt_study.todo_alarm.categories.contents.ContentAdapter
 import com.kt_study.todo_alarm.categories.contents.ContentAlarmBtnClickListener
 import com.kt_study.todo_alarm.categories.contents.ContentCheckBoxChangeListener
 import com.kt_study.todo_alarm.categories.contents.ContentDeleteListener
-import com.kt_study.todo_alarm.categories.contents.ContentFocusChangeListener
 import com.kt_study.todo_alarm.categories.contents.ContentItem
 import com.kt_study.todo_alarm.categories.contents.ContentTextChangeListener
 import com.kt_study.todo_alarm.databinding.ItemCategoryBinding
@@ -23,11 +22,10 @@ import com.kt_study.todo_alarm.databinding.ItemCategoryBinding
 class CategoryAdapter(
     private val context: Context,
     private val categories: MutableList<CategoryItem>,
-    private val makeContentItems: (position: Int) -> Unit,
+    private val makeContentItems: (categoryPosition: Int) -> Unit,
 ) :
     RecyclerView.Adapter<CategoryViewHolder>() {
     private lateinit var contentClickListener: CategoryAlarmBtnClickListener
-    private lateinit var categoryFocusChangeListener: CategoryFocusChangeListener
     private lateinit var categoryTextChangeListener: CategoryTextChangeListener
     private lateinit var categoryCheckBoxChangeListener: CategoryCheckBoxChangeListener
     private lateinit var categoryContentDeleteListener: CategoryContentDeleteListener
@@ -83,21 +81,6 @@ class CategoryAdapter(
             }
         })
 
-        contentAdapter.setFocusChangeListener(object : ContentFocusChangeListener {
-            override fun onFocusOut(contentItem: ContentItem) {
-                categoryFocusChangeListener.onContentFocusOut(
-                    ContentItem(
-                        contentId = contentItem.contentId,
-                        categoryId = categories[holder.adapterPosition].id,
-                        toDo = contentItem.toDo,
-                        hour = contentItem.hour,
-                        min = contentItem.min,
-                        isChecked = contentItem.isChecked
-                    )
-                )
-            }
-        })
-
         contentAdapter.setTextChangeListener(object : ContentTextChangeListener {
             override fun onTextChange(position: Int, toDo: String) {
                 categoryTextChangeListener.onContentTextChange(
@@ -122,20 +105,6 @@ class CategoryAdapter(
         }
 
 
-        // etCategory의 값이 엔터를 눌렀을떄에 DB로 값이 업데이트가 되게 구현
-        holder.binding.etCategory.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {
-                val newValue = holder.binding.etCategory.text.toString()
-                val categoryId = categories[position].id
-                categoryFocusChangeListener.onFocusOut(
-                    CategoryItem(
-                        id = categoryId,
-                        title = newValue
-                    )
-                )
-            }
-        }
-
         holder.binding.etCategory.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -156,9 +125,6 @@ class CategoryAdapter(
 
     fun setCheckBoxChangeListener(listener: CategoryCheckBoxChangeListener){
         categoryCheckBoxChangeListener = listener
-    }
-    fun setFocusChangeListener(listener: CategoryFocusChangeListener) {
-        categoryFocusChangeListener = listener
     }
 
     fun setTextChangeListener(listener: CategoryTextChangeListener) {

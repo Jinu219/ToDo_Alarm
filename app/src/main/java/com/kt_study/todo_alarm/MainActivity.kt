@@ -8,7 +8,6 @@ import com.kt_study.todo_alarm.categories.CategoryAdapter
 import com.kt_study.todo_alarm.categories.CategoryAlarmBtnClickListener
 import com.kt_study.todo_alarm.categories.CategoryCheckBoxChangeListener
 import com.kt_study.todo_alarm.categories.CategoryContentDeleteListener
-import com.kt_study.todo_alarm.categories.CategoryFocusChangeListener
 import com.kt_study.todo_alarm.categories.CategoryItem
 import com.kt_study.todo_alarm.categories.CategoryTextChangeListener
 import com.kt_study.todo_alarm.categories.contents.ContentItem
@@ -145,20 +144,6 @@ class MainActivity : AppCompatActivity() {
                     alarmFragment.show(supportFragmentManager, "alarmFragment")
                 }
             })
-            categoryAdapter.setFocusChangeListener(
-                object : CategoryFocusChangeListener {
-                    override fun onFocusOut(categoryItem: CategoryItem) {
-                        val updateCategoryEntity = convertToCategoryEntity(categoryItem)
-                        viewModel.updateCategory(updateCategoryEntity)
-                    }
-
-                    override fun onContentFocusOut(contentItem: ContentItem) {
-                        val updateContentEntity = convertToContentEntity(contentItem)
-                        viewModel.updateContent(updateContentEntity)
-                    }
-                }
-            )
-
             binding.rvCategory.adapter = categoryAdapter
         }
 
