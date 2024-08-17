@@ -28,7 +28,6 @@ class ContentAdapter(
 ) : RecyclerView.Adapter<ContentViewHolder>() {
 
     private lateinit var alarmClickListener: ContentAlarmBtnClickListener
-    private lateinit var contentFocusChangeListener: ContentFocusChangeListener
     private lateinit var textChangeListener: ContentTextChangeListener
     private lateinit var checkBoxChangeListener: ContentCheckBoxChangeListener
     private lateinit var contentDeleteListener: ContentDeleteListener
@@ -120,24 +119,8 @@ class ContentAdapter(
         holder.binding.etContent.addTextChangedListener(textWatcher)
         holder.textWatcher = textWatcher
 
-        holder.binding.etContent.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {
-                val newValue = holder.binding.etContent.text.toString()
-                val contentId = contents.getOrNull(position)?.contentId
-                if (contentId != null) {
-                    contentFocusChangeListener.onFocusOut(
-                        ContentItem(
-                            contentId = contentId,
-                            categoryId = item.categoryId,
-                            toDo = newValue,
-                            hour = item.hour,
-                            min = item.min,
-                            isChecked = item.isChecked
-                        )
-                    )
-                }
-            }
-        }
+
+
     }
 
     val itemTouchHelperCallback =
@@ -298,10 +281,6 @@ class ContentAdapter(
         editText.text = spannable
     }
 
-
-    fun setFocusChangeListener(listener: ContentFocusChangeListener) {
-        contentFocusChangeListener = listener
-    }
 
     fun setTextChangeListener(listener: ContentTextChangeListener) {
         textChangeListener = listener
