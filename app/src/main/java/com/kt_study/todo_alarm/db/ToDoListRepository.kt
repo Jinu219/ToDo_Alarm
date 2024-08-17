@@ -8,8 +8,12 @@ class ToDoListRepository(
     private val contentDao: ContentDao
 ) {
 
-    val getAllContent: Flow<List<ContentEntity>> = contentDao.getAllContents()
-    val getAllCategory: Flow<List<CategoryEntity>> = categoryDao.getAllCategories()
+    val getAllContents: Flow<List<ContentEntity>> = contentDao.getAllContents()
+    val getAllCategories: Flow<List<CategoryEntity>> = categoryDao.getAllCategories()
+
+    suspend fun getMaxCategoryId(): Int? = categoryDao.getMaxCategoryId()
+
+    suspend fun getMaxContentId(): Int? = contentDao.getMaxContentId()
 
     // Insert
     @Suppress("RedundantSuspendModifier")
@@ -29,13 +33,33 @@ class ToDoListRepository(
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun updateCategory(category: CategoryEntity){
+    suspend fun updateCategory(category: CategoryEntity) {
         categoryDao.updateCategory(category)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun updateContent(content: ContentEntity){
+    suspend fun updateContent(content: ContentEntity) {
         contentDao.updateContent(content)
     }
+
+    // Delete
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun deleteContent(content: ContentEntity) {
+        contentDao.deleteContent(content)
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun clearDatabase() {
+        categoryDao.deleteAllCategories()
+        contentDao.deleteAllContents()
+    }
+
+    fun getContentsByCategoryId(categoryId: Int): Flow<List<ContentEntity>> {
+        return contentDao.getContentsByCategoryId(categoryId)
+    }
+
 }

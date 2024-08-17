@@ -22,6 +22,7 @@
         android:background="@null"
         android:fontFamily="@font/nsr"
         android:hint="@string/hint"
+        android:text="@string/to_do"
         android:includeFontPadding="false"
         android:inputType="text"
         android:textSize="20sp"
@@ -38,16 +39,6 @@
         app:layout_constraintStart_toEndOf="@id/cbCheck"
         app:layout_constraintTop_toBottomOf="@id/etContent"
         tools:text="@string/to_do_time" />
-
-    <Button
-        android:id="@+id/btnAlarm"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:text="알"
-        android:layout_marginEnd="4dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
 
 
 
