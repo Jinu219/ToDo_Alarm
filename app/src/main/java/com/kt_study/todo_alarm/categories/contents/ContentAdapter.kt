@@ -25,7 +25,7 @@ import com.kt_study.todo_alarm.databinding.ItemContentBinding
 class ContentAdapter(
     private val context: Context,
     private val contents: MutableList<ContentItem>,
-    private val onAlarmToggle: (Boolean, Int, Int) -> Unit,
+    private val onAlarmToggle: (Boolean, ContentItem) -> Unit,
 ) : RecyclerView.Adapter<ContentViewHolder>() {
 
     private lateinit var alarmClickListener: ContentAlarmBtnClickListener
@@ -125,7 +125,7 @@ class ContentAdapter(
 
         // 알림을 켜고 끌 수 있는 Switch
         holder.binding.swNotification.setOnCheckedChangeListener { _, isChecked ->
-            onAlarmToggle(isChecked, item.hour, item.min)
+            onAlarmToggle(isChecked, item)
         }
     }
 

@@ -25,12 +25,15 @@ class ToDoAlarmReceiver : BroadcastReceiver() {
         }
         Log.d("alarm log in Receiver", "Broadcast received!!")
         if (intent.extras?.getInt("code") == MainActivity.REQUEST_CODE) {
+            // 알림 채널 생성
             createNotificationChannel(context)
             Log.d("alarm log in Receiver", "alarm received!!")
 
+            // 알림을 눌렀을 때 앱이 켜지도록 intent 생성
             val intentForMainActivity = Intent(context, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
+
             val pendingIntent = PendingIntent.getActivity(
                 context,
                 MainActivity.REQUEST_CODE,
@@ -38,13 +41,13 @@ class ToDoAlarmReceiver : BroadcastReceiver() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
-            val contents = "Contents Contents Contents Contents Contents Contents Contents " +
-                    "Contents Contents Contents Contents Contents Contents Contents "
+            val title = intent.extras!!.getString("title", "ToDo_Alarm_Notification")
+            val contents = "할 일을 해야할 시간입니다"
 
             // Notification
             var notification = NotificationCompat.Builder(context, "todo_channel").apply {
                 setSmallIcon(R.drawable.ic_launcher_background)
-                setContentTitle("Title 1")  // Set Title
+                setContentTitle(title)  // Set Title
                 setContentText(contents)   // Set Content
                 priority = NotificationCompat.PRIORITY_DEFAULT  // Set PRIORITY
                 setContentIntent(pendingIntent) // Notification Click Event
@@ -52,7 +55,7 @@ class ToDoAlarmReceiver : BroadcastReceiver() {
             }
 
             with(NotificationManagerCompat.from(context)) {
-                notify(5, notification.build())
+                notify(6, notification.build())
             }
         }
     }

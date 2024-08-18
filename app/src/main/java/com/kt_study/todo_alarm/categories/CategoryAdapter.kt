@@ -23,7 +23,7 @@ class CategoryAdapter(
     private val context: Context,
     private val categories: MutableList<CategoryItem>,
     private val makeContentItems: (categoryPosition: Int) -> Unit,
-    private val onAlarmToggle: (Boolean, Int, Int) -> Unit,
+    private val onAlarmToggle: (Boolean, ContentItem) -> Unit,
 ) :
     RecyclerView.Adapter<CategoryViewHolder>() {
     private lateinit var contentClickListener: CategoryAlarmBtnClickListener

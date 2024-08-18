@@ -60,10 +60,11 @@ class MainActivity : AppCompatActivity() {
                     val categoryId = categories[position].id
                     viewModel.makeContent(position, categoryId, "", 0, 0, false)
                 },
-                { isChecked, selectedHour, selectedMinute ->
+                { isChecked, content ->
                     val pendingIntent =
                         Intent(binding.root.context, ToDoAlarmReceiver::class.java).let {
                             it.putExtra("code", REQUEST_CODE)
+                            it.putExtra("title", content.toDo)
                             PendingIntent.getBroadcast(
                                 binding.root.context,
                                 REQUEST_CODE,
@@ -79,8 +80,8 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         val triggerTime = Calendar.getInstance().apply {
-                                set(Calendar.HOUR_OF_DAY, selectedHour)
-                                set(Calendar.MINUTE, selectedMinute)
+                                set(Calendar.HOUR_OF_DAY, content.hour)
+                                set(Calendar.MINUTE, content.min)
                                 set(Calendar.SECOND, 0)
                                 set(Calendar.MILLISECOND, 0)
                             }.timeInMillis
