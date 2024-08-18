@@ -25,7 +25,7 @@ import com.kt_study.todo_alarm.databinding.ItemContentBinding
 class ContentAdapter(
     private val context: Context,
     private val contents: MutableList<ContentItem>,
-    private val onAlarmToggle: (Boolean) -> Unit,
+    private val onAlarmToggle: (Boolean, Int, Int) -> Unit,
 ) : RecyclerView.Adapter<ContentViewHolder>() {
 
     private lateinit var alarmClickListener: ContentAlarmBtnClickListener
@@ -64,6 +64,8 @@ class ContentAdapter(
             return
         }
 
+        holder.bind(contents[position])
+
         val item = contents[position]
         holder.binding.tvAlarmTime.text =
             context.getString(R.string.to_do_time, item.hour, item.min)
@@ -91,7 +93,8 @@ class ContentAdapter(
                         toDo = item.toDo,
                         hour = item.hour,
                         min = item.min,
-                        isChecked = item.isChecked
+                        isChecked = item.isChecked,
+                        isNotificationEnabled = item.isNotificationEnabled
                     )
                 )
                 updateEditTextStyle(
@@ -122,7 +125,7 @@ class ContentAdapter(
 
         // 알림을 켜고 끌 수 있는 Switch
         holder.binding.swNotification.setOnCheckedChangeListener { _, isChecked ->
-            onAlarmToggle(isChecked)
+            onAlarmToggle(isChecked, item.hour, item.min)
         }
     }
 

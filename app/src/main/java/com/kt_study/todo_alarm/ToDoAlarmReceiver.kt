@@ -23,12 +23,10 @@ class ToDoAlarmReceiver : BroadcastReceiver() {
             Log.e("ToDoAlarmReceiver", "Context or Intent is null")
             return
         }
-
-        if (intent!!.extras?.getInt("code") == MainActivity.REQUEST_CODE) {
-            var count = intent.getIntExtra("count", 0)
-            Log.d("myLog", "$count")
-
+        Log.d("alarm log in Receiver", "Broadcast received!!")
+        if (intent.extras?.getInt("code") == MainActivity.REQUEST_CODE) {
             createNotificationChannel(context)
+            Log.d("alarm log in Receiver", "alarm received!!")
 
             val intentForMainActivity = Intent(context, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -57,23 +55,9 @@ class ToDoAlarmReceiver : BroadcastReceiver() {
                 notify(5, notification.build())
             }
         }
-
-
-//        context?.let {
-//            val notificationManager = it.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//
-//            val notification = NotificationCompat.Builder(it, "todo_channel")
-//                .setSmallIcon(R.drawable.ic_launcher_background)
-//                .setContentTitle("Reminder")
-//                .setContentText("It's time to do something")
-//                .setAutoCancel(true)
-//                .build()
-//
-//            notificationManager.notify(0, notification)
-//        }
     }
 
-    fun createNotificationChannel(context: Context) {
+    private fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 "todo_channel",

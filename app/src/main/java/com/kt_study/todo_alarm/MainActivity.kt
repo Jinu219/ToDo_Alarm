@@ -6,14 +6,12 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.icu.util.Calendar
 import android.os.Build
 import android.os.Bundle
-import android.os.SystemClock
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -34,7 +32,7 @@ import com.kt_study.todo_alarm.db.ContentEntity
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var categoryAdapter: CategoryAdapter
-    private lateinit var permissionLauncher: ActivityResultLauncher<String>
+    private val alarmManager by lazy { binding.root.context.getSystemService(Context.ALARM_SERVICE) as AlarmManager }
     private var isAlarmSetting = false
     private val viewModel: MainViewModel by viewModels {
         MainViewModelFactory(
@@ -50,16 +48,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         initObserve()
         initBtn()
-
-        permissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted ->
-            if (isGranted) {
-                Toast.makeText(this, "Notification permission granted", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Notification permission denied", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
 
@@ -72,16 +60,13 @@ class MainActivity : AppCompatActivity() {
                     val categoryId = categories[position].id
                     viewModel.makeContent(position, categoryId, "", 0, 0, false)
                 },
-                { isChecked ->
-                    val alarmManager =
-                        binding.root.context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                { isChecked, selectedHour, selectedMinute ->
                     val pendingIntent =
                         Intent(binding.root.context, ToDoAlarmReceiver::class.java).let {
                             it.putExtra("code", REQUEST_CODE)
-                            it.putExtra("count", 10)
                             PendingIntent.getBroadcast(
                                 binding.root.context,
-                                101,
+                                REQUEST_CODE,
                                 it,
                                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                             )
@@ -93,11 +78,18 @@ class MainActivity : AppCompatActivity() {
                             checkNotificationPermission()
                         }
 
+                        val triggerTime = Calendar.getInstance().apply {
+                                set(Calendar.HOUR_OF_DAY, selectedHour)
+                                set(Calendar.MINUTE, selectedMinute)
+                                set(Calendar.SECOND, 0)
+                                set(Calendar.MILLISECOND, 0)
+                            }.timeInMillis
+
                         // 알람 권한 요청을 받은 후
                         // 알람을 설정함
                         alarmManager.set(
-                            AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                            SystemClock.elapsedRealtime() + 1000 * 10,
+                            AlarmManager.RTC_WAKEUP,
+                            triggerTime,
                             pendingIntent
                         )
                         Log.d("alarm log", "alarm activating")
@@ -243,7 +235,7 @@ class MainActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED // 알림 권한이 있을 때
+            ) != PackageManager.PERMISSION_GRANTED // 알림 권한이 없을 때
         ) {
             ActivityCompat.requestPermissions(
                 this,
@@ -266,6 +258,19 @@ class MainActivity : AppCompatActivity() {
             } else {
                 // 권한이 거부됨
                 // Switch 버튼을 off로 바꿈
+//                val pendingIntent =
+//                    Intent(binding.root.context, ToDoAlarmReceiver::class.java).let {
+//                        it.putExtra("code", REQUEST_CODE)
+//                        it.putExtra("count", 10)
+//                        PendingIntent.getBroadcast(
+//                            binding.root.context,
+//                            REQUEST_CODE,
+//                            it,
+//                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+//                        )
+//                    }
+//                alarmManager.cancel(pendingIntent)
+                Toast.makeText(this, "알림 권한을 활성화 해주세요", Toast.LENGTH_SHORT).show()
                 Log.d("Alarm Log", "Notification Permission Failed")
             }
         }
