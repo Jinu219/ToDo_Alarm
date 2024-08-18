@@ -64,10 +64,11 @@ class MainActivity : AppCompatActivity() {
                     val pendingIntent =
                         Intent(binding.root.context, ToDoAlarmReceiver::class.java).let {
                             it.putExtra("code", REQUEST_CODE)
+                            it.putExtra("id", content.contentId)
                             it.putExtra("title", content.toDo)
                             PendingIntent.getBroadcast(
                                 binding.root.context,
-                                REQUEST_CODE,
+                                content.contentId, // 서로 다른 request code를 사용하여 인텐트가 중복되지 않도록 함
                                 it,
                                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                             )

@@ -41,6 +41,7 @@ class ToDoAlarmReceiver : BroadcastReceiver() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
+            val id = intent.extras!!.getInt("id", 0)
             val title = intent.extras!!.getString("title", "ToDo_Alarm_Notification")
             val contents = "할 일을 해야할 시간입니다"
 
@@ -55,7 +56,7 @@ class ToDoAlarmReceiver : BroadcastReceiver() {
             }
 
             with(NotificationManagerCompat.from(context)) {
-                notify(6, notification.build())
+                notify(id, notification.build())
             }
         }
     }
