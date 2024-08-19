@@ -4,6 +4,6 @@ import com.kt_study.todo_alarm.categories.contents.ContentItem
 
 data class CategoryItem(
     val id: Int,
-    val title: String = "",
+    var title: String = "",
     var contents: MutableList<ContentItem> = mutableListOf(),
 )

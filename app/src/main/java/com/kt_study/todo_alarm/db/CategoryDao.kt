@@ -18,6 +18,9 @@ interface CategoryDao {
     @Query("SELECT MAX(id) FROM table_category")
     suspend fun getMaxCategoryId(): Int?
 
+    @Query("SELECT * FROM table_category WHERE id = :categoryId LIMIT 1")
+    fun getCategoryById(categoryId: Int): Flow<CategoryEntity?>
+
     @Insert
     fun insertCategory(categoryEntity: CategoryEntity)
 

@@ -15,6 +15,10 @@ class ToDoListRepository(
 
     suspend fun getMaxContentId(): Int? = contentDao.getMaxContentId()
 
+    fun getCategoryById(categoryId: Int): Flow<CategoryEntity?> {
+        return categoryDao.getCategoryById(categoryId)
+    }
+
     // Insert
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
