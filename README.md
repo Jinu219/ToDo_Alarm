@@ -23,3 +23,20 @@
       </tr>
 </table>
 <br>
+
+
+### 브랜치 컨벤션
+
+```yaml
+- [feat] : 기능 추가
+- [fix] : 에러 수정, 버그 수정
+- [docs] : README, 문서
+- [refactor] : 코드 리펙토링 (기능 변경 없이 코드만 수정할 때)
+- [chore] : gradle 세팅, 위의 것 이외에 거의 모든 것
+```
+
+
+### 기술 스택
+<img alt="Koltin" src ="https://img.shields.io/badge/Kotlin-7F52FF.svg?&style=for-the-badge&logo=Kotlin&logoColor=black">
+
+<img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"> <img src="https://img.shields.io/badge/figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white"><img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white"><img src="https://img.shields.io/badge/discord-5865f2?style=for-the-badge&logo=discord&logoColor=white">
