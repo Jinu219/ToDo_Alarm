@@ -6,7 +6,7 @@
 </div>
 
 
-<table>
+<table align="center">
   <tr>
     <td align="center"><img src="https://avatars.githubusercontent.com/u/66197586?v=4" width="128px;" alt=""/><br /><sub><b>이진우</sub></a><br /><a href="https://github.com/Jinu219" title="Code">💻</a></td>
     <td align="center"><img src="https://avatars.githubusercontent.com/u/124599614?v=4" width="128px;" alt=""/><br /><sub><b>김균호</b></sub></a><br /><a href="https://github.com/g0rnn" title="Code">💻</a></td>
