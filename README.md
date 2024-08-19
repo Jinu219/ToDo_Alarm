@@ -3,6 +3,17 @@
 <br>
 </div>
 
+## 24-1 WAP 앱스터디 토이프로젝트 : ToDo_Alarm
+
+### 프로젝트 소개 
+- 프로젝트의 이름은 “To Do Alarm”이며. 투두 리스트와, 알람 기능이 합쳐진 앱입니다.
+
+- 앱 스터디에서 많이 배운 내용에 대해 영향을 받아, To Do List에 대한 앱을 토이프로젝트로 결정이 되었습니다.
+
+- 또한, 아이폰의 기본 앱인 **"미리 알림"** 이라는 앱을 클론 코딩 하여 프로젝트를 진행하였습니다.
+
+
+### 팀원 구성
 <table align="center">
   <tr>
     <td align="center"><img src="https://avatars.githubusercontent.com/u/66197586?v=4" width="128px;" alt=""/></td>
@@ -14,10 +25,3 @@
       </tr>
 </table>
 <br>
-
-
-<hr>
-
-## 2024년도 1학기 WAP 프로그래밍 동아리 앱스터디 토이프로젝트
-
-### ToDo_Alarm
