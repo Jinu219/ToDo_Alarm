@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
                 categories.toMutableList()
             ) { position ->
                 val categoryId = categories[position].id
-                viewModel.makeContent(position, categoryId, "", 0, 0, false)
+                viewModel.makeContent(position, categoryId, "", 0, 0, false, false)
             }
 
             categoryAdapter.setCategoryContentDeleteListener(object :

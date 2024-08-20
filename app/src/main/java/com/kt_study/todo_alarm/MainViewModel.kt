@@ -40,7 +40,9 @@ class MainViewModel(
                             toDo = contentEntity.toDo,
                             hour = contentEntity.hour,
                             min = contentEntity.min,
-                            isChecked = contentEntity.isChecked
+                            isChecked = contentEntity.isChecked,
+                            isNotificationEnabled = contentEntity.isNotificationEnabled
+
                         )
                     }.toMutableList()
 
@@ -123,7 +125,8 @@ class MainViewModel(
                                 toDo = contentEntity.toDo,
                                 hour = contentEntity.hour,
                                 min = contentEntity.min,
-                                isChecked = contentEntity.isChecked
+                                isChecked = contentEntity.isChecked,
+                                isNotificationEnabled = contentEntity.isNotificationEnabled
                             )
                         }.toMutableList()
                 )
@@ -152,7 +155,8 @@ class MainViewModel(
         toDo: String,
         hour: Int,
         min: Int,
-        isChecked: Boolean
+        isChecked: Boolean,
+        isNotificationEnabled: Boolean
     ) {
         viewModelScope.launch {
             val newContentId = getNextContentId()
@@ -176,7 +180,8 @@ class MainViewModel(
                 toDo = toDo,
                 hour = hour,
                 min = min,
-                isChecked = isChecked
+                isChecked = isChecked,
+                isNotificationEnabled = isNotificationEnabled
             )
 
             category?.contents?.add(newContent)
@@ -192,13 +197,12 @@ class MainViewModel(
                     toDo = newContent.toDo,
                     hour = newContent.hour,
                     min = newContent.min,
-                    isChecked = newContent.isChecked
+                    isChecked = newContent.isChecked,
+                    isNotificationEnabled = newContent.isNotificationEnabled
                 )
             )
         }
     }
-
-
 
 
     fun clearDatabase() = viewModelScope.launch {

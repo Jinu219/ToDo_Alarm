@@ -73,6 +73,8 @@ class ContentAdapter(
         holder.binding.etContent.text =
             SpannableStringBuilder(context.getString(R.string.to_do, item.toDo))
 
+        holder.binding.swNotification.isChecked = item.isNotificationEnabled
+
         updateEditTextStyle(
             holder.binding.etContent,
             item.isChecked,
