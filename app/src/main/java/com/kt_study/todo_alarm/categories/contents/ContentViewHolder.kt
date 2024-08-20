@@ -8,5 +8,7 @@ class ContentViewHolder(
     val binding: ItemContentBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
     var textWatcher: TextWatcher? = null
-    fun bind() {}
+    fun bind(contentItem: ContentItem) {
+        binding.swNotification.isChecked = contentItem.isNotificationEnabled
+    }
 }

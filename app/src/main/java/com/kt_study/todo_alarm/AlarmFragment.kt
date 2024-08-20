@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TimePicker
 import androidx.fragment.app.DialogFragment
 import com.kt_study.todo_alarm.databinding.FragmentAlarmBinding
 
@@ -20,7 +18,7 @@ class AlarmFragment(
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentAlarmBinding.inflate(inflater, container, false)
         return binding.root

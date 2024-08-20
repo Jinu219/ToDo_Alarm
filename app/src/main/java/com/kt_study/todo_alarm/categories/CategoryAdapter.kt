@@ -23,6 +23,7 @@ class CategoryAdapter(
     private val context: Context,
     private val categories: MutableList<CategoryItem>,
     private val makeContentItems: (categoryPosition: Int) -> Unit,
+    private val onAlarmToggle: (Boolean, ContentItem) -> Unit,
 ) :
     RecyclerView.Adapter<CategoryViewHolder>() {
     private lateinit var contentClickListener: CategoryAlarmBtnClickListener
@@ -43,18 +44,19 @@ class CategoryAdapter(
 
     override fun onBindViewHolder(
         holder: CategoryViewHolder,
-        @SuppressLint("RecyclerView") position: Int
+        @SuppressLint("RecyclerView") position: Int,
     ) {
         holder.bind(categories[position])
         val item = categories[position]
         holder.binding.etCategory.text =
             SpannableStringBuilder(context.getString(R.string.to_do_title, item.title))
 
-        val contentAdapter = ContentAdapter(holder.itemView.context, categories[position].contents)
+        val contentAdapter =
+            ContentAdapter(holder.itemView.context, categories[position].contents, onAlarmToggle)
         holder.contentRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context)
         holder.contentRecyclerView.adapter = contentAdapter
 
-        contentAdapter.setCheckBoxChangeListener(object : ContentCheckBoxChangeListener{
+        contentAdapter.setCheckBoxChangeListener(object : ContentCheckBoxChangeListener {
             override fun onCheckBoxChanged(contentItem: ContentItem) {
                 categoryCheckBoxChangeListener.onCheckBoxChanged(
                     categoryPosition = position,
@@ -67,7 +69,7 @@ class CategoryAdapter(
         contentAdapter.setOnAlarmClickListener(object : ContentAlarmBtnClickListener {
             override fun onAlarmBtnClick(
                 contentPosition: Int,
-                ontTimeSet: (hour: Int, min: Int) -> Unit
+                ontTimeSet: (hour: Int, min: Int) -> Unit,
             ) {
                 val currentContent = categories[position].contents[contentPosition]
                 contentClickListener.onContentClick(
@@ -122,8 +124,7 @@ class CategoryAdapter(
         return categories[categoryPosition].contents[contentPosition]
     }
 
-
-    fun setCheckBoxChangeListener(listener: CategoryCheckBoxChangeListener){
+    fun setCheckBoxChangeListener(listener: CategoryCheckBoxChangeListener) {
         categoryCheckBoxChangeListener = listener
     }
 
@@ -134,6 +135,7 @@ class CategoryAdapter(
     fun setContentClickListener(listener: CategoryAlarmBtnClickListener) {
         contentClickListener = listener
     }
+
     fun setCategoryContentDeleteListener(listener: CategoryContentDeleteListener) {
         categoryContentDeleteListener = listener
     }
