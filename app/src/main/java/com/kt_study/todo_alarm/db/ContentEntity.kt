@@ -11,5 +11,6 @@ data class ContentEntity(
     var toDo: String = "",
     var hour: Int = 0,
     var min: Int = 0,
-    var isChecked: Boolean = false
+    var isChecked: Boolean = false,
+    var isNotificationEnabled: Boolean = false
 )

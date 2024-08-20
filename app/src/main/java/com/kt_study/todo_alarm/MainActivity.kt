@@ -21,6 +21,7 @@ import com.kt_study.todo_alarm.categories.CategoryAdapter
 import com.kt_study.todo_alarm.categories.CategoryAlarmBtnClickListener
 import com.kt_study.todo_alarm.categories.CategoryCheckBoxChangeListener
 import com.kt_study.todo_alarm.categories.CategoryContentDeleteListener
+import com.kt_study.todo_alarm.categories.CategoryContentNotificationListener
 import com.kt_study.todo_alarm.categories.CategoryItem
 import com.kt_study.todo_alarm.categories.CategoryTextChangeListener
 import com.kt_study.todo_alarm.categories.contents.ContentItem
@@ -55,52 +56,11 @@ class MainActivity : AppCompatActivity() {
         viewModel.categories.observe(this) { categories ->
             categoryAdapter = CategoryAdapter(
                 this,
-                categories.toMutableList(),
-                { position ->
-                    val categoryId = categories[position].id
-                    viewModel.makeContent(position, categoryId, "", 0, 0, false)
-                },
-                { isChecked, content ->
-                    val pendingIntent =
-                        Intent(binding.root.context, ToDoAlarmReceiver::class.java).let {
-                            it.putExtra("code", REQUEST_CODE)
-                            it.putExtra("id", content.contentId)
-                            it.putExtra("title", content.toDo)
-                            PendingIntent.getBroadcast(
-                                binding.root.context,
-                                content.contentId, // 서로 다른 request code를 사용하여 인텐트가 중복되지 않도록 함
-                                it,
-                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                            )
-                        }
-
-                    if (isChecked) {
-                        // 알람 권한 확인 - API가 33 이상일때만 권한 요청이 필요하므로 사용자에게 권한 설정을 요구함
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            checkNotificationPermission()
-                        }
-
-                        val triggerTime = Calendar.getInstance().apply {
-                                set(Calendar.HOUR_OF_DAY, content.hour)
-                                set(Calendar.MINUTE, content.min)
-                                set(Calendar.SECOND, 0)
-                                set(Calendar.MILLISECOND, 0)
-                            }.timeInMillis
-
-                        // 알람 권한 요청을 받은 후
-                        // 알람을 설정함
-                        alarmManager.set(
-                            AlarmManager.RTC_WAKEUP,
-                            triggerTime,
-                            pendingIntent
-                        )
-                        Log.d("alarm log", "alarm activating")
-                    } else {
-                        // 알람을 해제함
-                        alarmManager.cancel(pendingIntent)
-                    }
-                }
-            )
+                categories.toMutableList()
+            ) { position ->
+                val categoryId = categories[position].id
+                viewModel.makeContent(position, categoryId, "", 0, 0, false)
+            }
 
             categoryAdapter.setCategoryContentDeleteListener(object :
                 CategoryContentDeleteListener {
@@ -167,6 +127,65 @@ class MainActivity : AppCompatActivity() {
                 }
             })
 
+            categoryAdapter.setCategoryContentNotificationListener(object :
+                CategoryContentNotificationListener {
+                override fun categoryContentNotificationListener(
+                    categoryPosition: Int,
+                    contentPosition: Int,
+                    isNotificationEnabled: Boolean
+                ) {
+                    val contentItem =
+                        categoryAdapter.getContentItem(categoryPosition, contentPosition)
+                    val contentEntity = convertToContentEntity(contentItem)
+                    val categoryId = categories[categoryPosition].id
+                    val contentId = contentItem.contentId
+                    val updatedEntity = contentEntity.copy(
+                        categoryId = categoryId,
+                        contentId = contentId,
+                        isNotificationEnabled = isNotificationEnabled
+                    )
+                    viewModel.updateContent(updatedEntity)
+                    val pendingIntent =
+                        Intent(binding.root.context, ToDoAlarmReceiver::class.java).let {
+                            it.putExtra("code", REQUEST_CODE)
+                            it.putExtra("id", contentItem.contentId)
+                            it.putExtra("title", contentItem.toDo)
+                            PendingIntent.getBroadcast(
+                                binding.root.context,
+                                contentItem.contentId, // 서로 다른 request code를 사용하여 인텐트가 중복되지 않도록 함
+                                it,
+                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                            )
+                        }
+
+                    if (isNotificationEnabled) {
+                        // 알람 권한 확인 - API가 33 이상일때만 권한 요청이 필요하므로 사용자에게 권한 설정을 요구함
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            checkNotificationPermission()
+                        }
+
+                        val triggerTime = Calendar.getInstance().apply {
+                            set(Calendar.HOUR_OF_DAY, contentItem.hour)
+                            set(Calendar.MINUTE, contentItem.min)
+                            set(Calendar.SECOND, 0)
+                            set(Calendar.MILLISECOND, 0)
+                        }.timeInMillis
+
+                        // 알람 권한 요청을 받은 후
+                        // 알람을 설정함
+                        alarmManager.set(
+                            AlarmManager.RTC_WAKEUP,
+                            triggerTime,
+                            pendingIntent
+                        )
+                        Log.d("alarm log", "alarm activating")
+                    } else {
+                        // 알람을 해제함
+                        alarmManager.cancel(pendingIntent)
+                    }
+
+                }
+            })
             categoryAdapter.setContentClickListener(object : CategoryAlarmBtnClickListener {
                 override fun onContentClick(
                     parentPosition: Int,

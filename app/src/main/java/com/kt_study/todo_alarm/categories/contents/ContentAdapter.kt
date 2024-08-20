@@ -25,13 +25,13 @@ import com.kt_study.todo_alarm.databinding.ItemContentBinding
 class ContentAdapter(
     private val context: Context,
     private val contents: MutableList<ContentItem>,
-    private val onAlarmToggle: (Boolean, ContentItem) -> Unit,
 ) : RecyclerView.Adapter<ContentViewHolder>() {
 
     private lateinit var alarmClickListener: ContentAlarmBtnClickListener
     private lateinit var textChangeListener: ContentTextChangeListener
     private lateinit var checkBoxChangeListener: ContentCheckBoxChangeListener
     private lateinit var contentDeleteListener: ContentDeleteListener
+    private lateinit var contentNotificationListener: ContentNotificationListener
 
     // 아이콘과 배경색 설정
     private val deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_delete)
@@ -124,8 +124,8 @@ class ContentAdapter(
         holder.textWatcher = textWatcher
 
         // 알림을 켜고 끌 수 있는 Switch
-        holder.binding.swNotification.setOnCheckedChangeListener { _, isChecked ->
-            onAlarmToggle(isChecked, item)
+        holder.binding.swNotification.setOnCheckedChangeListener { _, isNotificationEnabled ->
+            contentNotificationListener.onActiveAlarm(holder.adapterPosition, isNotificationEnabled)
         }
     }
 
@@ -302,5 +302,9 @@ class ContentAdapter(
 
     fun setContentDeleteListener(listener: ContentDeleteListener) {
         contentDeleteListener = listener
+    }
+
+    fun setContentNotificationListener(listener: ContentNotificationListener) {
+        contentNotificationListener = listener
     }
 }

@@ -16,6 +16,7 @@ import com.kt_study.todo_alarm.categories.contents.ContentAlarmBtnClickListener
 import com.kt_study.todo_alarm.categories.contents.ContentCheckBoxChangeListener
 import com.kt_study.todo_alarm.categories.contents.ContentDeleteListener
 import com.kt_study.todo_alarm.categories.contents.ContentItem
+import com.kt_study.todo_alarm.categories.contents.ContentNotificationListener
 import com.kt_study.todo_alarm.categories.contents.ContentTextChangeListener
 import com.kt_study.todo_alarm.databinding.ItemCategoryBinding
 
@@ -23,13 +24,13 @@ class CategoryAdapter(
     private val context: Context,
     private val categories: MutableList<CategoryItem>,
     private val makeContentItems: (categoryPosition: Int) -> Unit,
-    private val onAlarmToggle: (Boolean, ContentItem) -> Unit,
 ) :
     RecyclerView.Adapter<CategoryViewHolder>() {
     private lateinit var contentClickListener: CategoryAlarmBtnClickListener
     private lateinit var categoryTextChangeListener: CategoryTextChangeListener
     private lateinit var categoryCheckBoxChangeListener: CategoryCheckBoxChangeListener
     private lateinit var categoryContentDeleteListener: CategoryContentDeleteListener
+    private lateinit var categoryContentNotificationListener: CategoryContentNotificationListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val binding = ItemCategoryBinding.inflate(
@@ -52,7 +53,7 @@ class CategoryAdapter(
             SpannableStringBuilder(context.getString(R.string.to_do_title, item.title))
 
         val contentAdapter =
-            ContentAdapter(holder.itemView.context, categories[position].contents, onAlarmToggle)
+            ContentAdapter(holder.itemView.context, categories[position].contents)
         holder.contentRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context)
         holder.contentRecyclerView.adapter = contentAdapter
 
@@ -66,6 +67,11 @@ class CategoryAdapter(
             }
         })
 
+        contentAdapter.setContentNotificationListener(object : ContentNotificationListener{
+            override fun onActiveAlarm(contentPosition: Int, isNotificationEnabled: Boolean) {
+                categoryContentNotificationListener.categoryContentNotificationListener(holder.adapterPosition, contentPosition, isNotificationEnabled)
+            }
+        })
         contentAdapter.setOnAlarmClickListener(object : ContentAlarmBtnClickListener {
             override fun onAlarmBtnClick(
                 contentPosition: Int,
@@ -138,5 +144,9 @@ class CategoryAdapter(
 
     fun setCategoryContentDeleteListener(listener: CategoryContentDeleteListener) {
         categoryContentDeleteListener = listener
+    }
+
+    fun setCategoryContentNotificationListener(listener: CategoryContentNotificationListener){
+        categoryContentNotificationListener = listener
     }
 }
