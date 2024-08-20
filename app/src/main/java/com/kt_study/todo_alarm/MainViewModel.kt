@@ -154,11 +154,22 @@ class MainViewModel(
         min: Int,
         isChecked: Boolean
     ) {
-
         viewModelScope.launch {
-
             val newContentId = getNextContentId()
-            // 현재 카테고리에 속한 기존 콘텐츠를 가져옵니다.
+
+            // LiveData에서 현재 카테고리 목록을 가져옵니다.
+            val categories = _categories.value?.toMutableList() ?: mutableListOf()
+
+            // 수정된 카테고리 정보를 가져오기 위해 DB에서 최신 카테고리 정보를 가져옵니다.
+            val updatedCategoryEntity = repository.getCategoryById(categoryId).firstOrNull()
+
+            if (updatedCategoryEntity == null) return@launch // 카테고리를 찾지 못하면 종료
+
+            // 카테고리 제목을 수정된 값으로 설정
+            val category = categories.find { it.id == categoryId }
+            category?.title = updatedCategoryEntity.title // 수정된 제목 반영
+
+            // 새로운 콘텐츠를 추가합니다.
             val newContent = ContentItem(
                 contentId = newContentId,
                 categoryId = categoryId,
@@ -167,35 +178,8 @@ class MainViewModel(
                 min = min,
                 isChecked = isChecked
             )
-            val existingContents = withContext(Dispatchers.IO) {
-                repository.getContentsByCategoryId(categoryId).firstOrNull() ?: listOf()
-            }
 
-            // 기존 콘텐츠를 ContentItem으로 변환하고 새 콘텐츠를 추가합니다.
-            val updatedContents = existingContents.map { contentEntity ->
-                ContentItem(
-                    contentId = contentEntity.contentId,
-                    categoryId = contentEntity.categoryId,
-                    toDo = contentEntity.toDo,
-                    hour = contentEntity.hour,
-                    min = contentEntity.min,
-                    isChecked = contentEntity.isChecked
-                )
-            }.toMutableList().apply {
-                add(newContent) // 새 콘텐츠를 리스트에 추가합니다.
-            }
-
-            // LiveData에서 현재 카테고리 목록을 가져옵니다.
-            val categories = _categories.value?.toMutableList() ?: mutableListOf()
-
-            // 새로운 콘텐츠를 추가할 특정 카테고리를 찾습니다.
-            val category = categories.find { it.id == categoryId }
-
-            // 특정 카테고리를 찾지 못하면 종료
-            if (category == null) return@launch
-
-            // 새로운 콘텐츠가 추가된 리스트로 콘텐츠를 업데이트합니다.
-            category.contents = updatedContents
+            category?.contents?.add(newContent)
 
             // 수정된 카테고리 목록으로 LiveData를 업데이트합니다.
             _categories.value = categories
@@ -213,6 +197,8 @@ class MainViewModel(
             )
         }
     }
+
+
 
 
     fun clearDatabase() = viewModelScope.launch {
